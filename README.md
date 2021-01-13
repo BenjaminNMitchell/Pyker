@@ -2,7 +2,7 @@
 
 
 ## Overview
-Pyker is made to help players to extract statistics and insights from poeker games.
+Pyker is made to help players to extract statistics and insights from poker games.
 
 ## Supported Formats
 - Pokernow
