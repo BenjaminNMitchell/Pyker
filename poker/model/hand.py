@@ -21,9 +21,10 @@ class Hand:
     third: street.Street
 
     def __str__(self):
+        player_string = ", ".join([str(player) for player in self.players])
         return (
             "----Hand----\n"
-            f"Players: {self.players}\n\n"
+            f"Players: {player_string}\n\n"
             f"Our Cards: {self.our_cards}\n"
             f"Pre Flop\n{self.preflop}\n\n"
             f"Flop: {self.flop}\n"

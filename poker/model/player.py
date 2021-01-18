@@ -13,3 +13,6 @@ class Player:
 
     def __eq__(self, other):
         return isinstance(other, Player) and self.id_ == other.id_
+
+    def __str__(self):
+        return self.name

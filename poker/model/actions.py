@@ -2,16 +2,18 @@
 
 from dataclasses import dataclass
 
+from poker.model.player import Player
+
 
 @dataclass
 class Action:
-    player: str
+    player: Player
 
     def __str__(self):
-        return f"{self.player} {self.__class__.__name__.lower()}s"
+        return f"{self.player.name} {self.__class__.__name__.lower()}s"
 
     def __repr__(self):
-        return f"{ self.__class__.__name__ }(player='{self.player}')"
+        return f"{ self.__class__.__name__ }(player='{repr(self.player)}')"
 
 
 class Check(Action):
@@ -24,16 +26,14 @@ class Fold(Action):
 
 @dataclass
 class ActionWithAmount:
-    player: str
-    amount: str
+    player: Player
+    amount: int
 
     def __str__(self):
-        return f"{self.player} {self.__class__.__name__.lower()}s {self.amount}"
+        return f"{self.player.name} {self.__class__.__name__.lower()}s {self.amount}"
 
     def __repr__(self):
-        return (
-            f"{ self.__class__.__name__ }(player='{self.player}', amount={self.amount})"
-        )
+        return f"{ self.__class__.__name__ }(player='{repr(self.player)}', amount={self.amount})"
 
 
 class Bet(ActionWithAmount):

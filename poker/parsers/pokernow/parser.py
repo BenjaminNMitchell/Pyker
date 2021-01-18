@@ -9,7 +9,7 @@ from poker.model import hand
 from poker.model import game
 from poker.model import player
 
-ACTIONS = ["posts", "bet", "raises", "calls", "checks", "folds"]
+ACTIONS = ["posts", "bets", "raises", "calls", "checks", "folds"]
 
 
 def parse_game(game_data):
@@ -141,8 +141,11 @@ def parse_cards(line):
     return flop_cards.split(",")
 
 
-PLAYER_REGEX = re.compile(
-    r'#([1-9][0-9]*) ""([-_a-zA-Z0-9]+) @ ([-_0-9a-zA-Z_]{10})"" \(([1-9][0-9]*)\)'
+PLAYER_REGEX_STR = r'""([-_a-zA-Z0-9]+) @ ([-_0-9a-zA-Z_]{10})""'
+PLAYER_REGEX = re.compile(PLAYER_REGEX_STR)
+
+PLAYER_STACK_REGEX = re.compile(
+    f"#([1-9][0-9]*) {PLAYER_REGEX_STR} \\(([1-9][0-9]*)\\)"
 )
 
 
@@ -154,7 +157,7 @@ def parse_players(line):
 
     player_objs = []
     for player_string in players:
-        match = PLAYER_REGEX.search(player_string)
+        match = PLAYER_STACK_REGEX.search(player_string)
         if match is None:
             raise ValueError(f"Error parsing player string: {player_string}")
 
@@ -184,42 +187,49 @@ def parse_street(hand, i, term_keyword):
     return street.Street(actions), i
 
 
+ACTION_REGEX_STR = f'"{PLAYER_REGEX_STR} ({"|".join(ACTIONS)})( a (missed )?big blind of| a (missing )?small blind of| to)?( [1-9][0-9]*)?'
+ACTION_REGEX = re.compile(ACTION_REGEX_STR)
+
+
 def parse_action(line):
-    try:
 
-        action_string, _, _ = line.split(",")
-        _, player, action = action_string[1:-1].split('""')
+    action_string, _, _ = line.split(",")
 
-        if "posts" in line:
-            amount = action.split(" ")[-1]
-            return actions.Post(player=player, amount=amount)
+    match = ACTION_REGEX.search(action_string)
+    if match is None:
+        raise ValueError(f"Could not parse action string: {action_string}")
 
-        if "bet" in line:
-            amount = action.split(" ")[-1]
-            return actions.Bet(player=player, amount=amount)
+    action_player = player.Player(name=match.group(1), id_=match.group(2))
+    action = match.group(3)
 
-        if "raises" in line:
-            amount = action.split(" ")[-1]
-            return actions.Raise(player=player, amount=amount)
+    if action in ("bets", "posts", "raises", "calls"):
+        if match.group(7) is None:
+            raise ValueError(f"Couldn't parse actionWithAmount from: {action_string}")
 
-        if "calls" in line:
-            amount = action.split(" ")[-1]
-            return actions.Call(player=player, amount=amount)
+        amount = int(match.group(7).strip())
 
-        if "checks" in line:
-            return actions.Check(player=player)
+    if "posts" in line:
+        return actions.Post(player=action_player, amount=amount)
 
-        if "folds" in line:
-            return actions.Fold(player=player)
+    elif "bets" in line:
+        return actions.Bet(player=action_player, amount=amount)
 
-        raise ValueError(f"Line: `{line}` does not a valid action keyword")
+    elif "raises" in line:
+        return actions.Raise(player=action_player, amount=amount)
 
-    except Exception as err:
-        raise ValueError(f"Error {err} parsing line as action: {line}")
+    elif "calls" in line:
+        return actions.Call(player=action_player, amount=amount)
+
+    elif "checks" in line:
+        return actions.Check(player=action_player)
+
+    elif "folds" in line:
+        return actions.Fold(player=action_player)
+
+    else:
+        raise ValueError("Error parsing action: line")
 
 
-def is_action(line):
-    for action_keyword in ACTIONS:
-        if action_keyword in line:
-            return True
-    return False
+def is_action(line: str) -> bool:
+    """Return True if the line can be parsed as an action."""
+    return ACTION_REGEX.match(line) is not None
