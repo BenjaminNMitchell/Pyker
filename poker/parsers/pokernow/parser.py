@@ -10,6 +10,9 @@ from poker.model import game
 from poker.model import player
 
 ACTIONS = ["posts", "bets", "raises", "calls", "checks", "folds"]
+FLOP_MARKER = "flop:"
+TURN_MARKER = "turn:"
+RIVER_MARKER = "river:"
 
 
 def parse_game(game_data):
@@ -67,12 +70,13 @@ def parse_hand(hand_lines):
     ]
     i += 1
 
-    preflop, i = parse_street(hand_lines, i, "Flop")
+    preflop, i = parse_street(hand_lines, i, FLOP_MARKER)
 
-    if "Flop" in hand_lines[i]:
+    if FLOP_MARKER in hand_lines[i].lower():
         flop = parse_cards(hand_lines[i])
         i += 1
     else:
+        logging.debug("No flop found on line %s", i)
         return hand.Hand(
             players=players,
             our_cards=our_cards,
@@ -85,12 +89,13 @@ def parse_hand(hand_lines):
             third=None,
         )
 
-    first, i = parse_street(hand_lines, i, "Turn")
+    first, i = parse_street(hand_lines, i, TURN_MARKER)
 
-    if "Turn" in hand_lines[i]:
+    if TURN_MARKER in hand_lines[i].lower():
         turn = parse_cards(hand_lines[i])
         i += 1
     else:
+        logging.debug("No turn found on line %s", i)
         return hand.Hand(
             players=players,
             our_cards=our_cards,
@@ -103,12 +108,13 @@ def parse_hand(hand_lines):
             third=None,
         )
 
-    second, i = parse_street(hand_lines, i, "River")
+    second, i = parse_street(hand_lines, i, RIVER_MARKER)
 
-    if "River" in hand_lines[i]:
+    if RIVER_MARKER in hand_lines[i].lower():
         river = parse_cards(hand_lines[i])
         i += 1
     else:
+        logging.debug("No river found on line %s", i)
         return hand.Hand(
             players=players,
             our_cards=our_cards,
@@ -141,7 +147,7 @@ def parse_cards(line):
     return flop_cards.split(",")
 
 
-PLAYER_REGEX_STR = r'""([-_a-zA-Z0-9]+) @ ([-_0-9a-zA-Z_]{10})""'
+PLAYER_REGEX_STR = r'""([-_a-zA-Z0-9 ]+?) @ ([-_0-9a-zA-Z_]{10})""'
 PLAYER_REGEX = re.compile(PLAYER_REGEX_STR)
 
 PLAYER_STACK_REGEX = re.compile(
@@ -172,7 +178,7 @@ def parse_street(hand, i, term_keyword):
 
     while True:
         line = hand[i]
-        if "-- ending hand" in line or term_keyword in line:
+        if "-- ending hand" in line or term_keyword in line.lower():
             break
 
         if is_action(line):

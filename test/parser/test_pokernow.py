@@ -2,8 +2,10 @@
 
 import unittest
 
-from poker.model import player
-from poker.model import actions
+from poker.model.actions import Bet, Call, Fold, Check, Post, Raise
+from poker.model.player import Player
+from poker.model.hand import Hand
+from poker.model.street import Street
 from poker.parsers.pokernow import parser
 
 
@@ -22,12 +24,12 @@ class ParserTests(unittest.TestCase):
         )
 
         expected = {
-            player.Player(id_="9z1zzoqiIt", name="Ert"),
-            player.Player(id_="TfZNpyIPhD", name="Suk"),
-            player.Player(id_="PjBYO_8gbf", name="Russ"),
-            player.Player(id_="bcp1N58-1M", name="Chon"),
-            player.Player(id_="eSbnubU-KP", name="Benny"),
-            player.Player(id_="izsy1Zibpi", name="Gargs"),
+            Player(id_="9z1zzoqiIt", name="Ert"),
+            Player(id_="TfZNpyIPhD", name="Suk"),
+            Player(id_="PjBYO_8gbf", name="Russ"),
+            Player(id_="bcp1N58-1M", name="Chon"),
+            Player(id_="eSbnubU-KP", name="Benny"),
+            Player(id_="izsy1Zibpi", name="Gargs"),
         }
 
         actual = parser.parse_players(test_player_lines)
@@ -47,32 +49,103 @@ class ParserTests(unittest.TestCase):
         ]
 
         expecteds = [
-            actions.Post(
-                player=player.Player(name="Russ", id_="PjBYO_8gbf"), amount=10
-            ),
-            actions.Post(
-                player=player.Player(name="Chon", id_="bcp1N58-1M"), amount=20
-            ),
-            actions.Post(
-                player=player.Player(name="Russ", id_="PjBYO_8gbf"), amount=10
-            ),
-            actions.Post(
-                player=player.Player(name="Russ", id_="PjBYO_8gbf"), amount=20
-            ),
-            actions.Bet(
-                player=player.Player(name="Benny", id_="eSbnubU-KP"), amount=75
-            ),
-            actions.Call(
-                player=player.Player(name="Chon", id_="bcp1N58-1M"), amount=900
-            ),
-            actions.Raise(
-                player=player.Player(name="Suk", id_="TfZNpyIPhD"), amount=900
-            ),
-            actions.Fold(player=player.Player(name="Benny", id_="eSbnubU-KP")),
-            actions.Check(player=player.Player(name="Russ", id_="PjBYO_8gbf")),
+            Post(player=Player(name="Russ", id_="PjBYO_8gbf"), amount=10),
+            Post(player=Player(name="Chon", id_="bcp1N58-1M"), amount=20),
+            Post(player=Player(name="Russ", id_="PjBYO_8gbf"), amount=10),
+            Post(player=Player(name="Russ", id_="PjBYO_8gbf"), amount=20),
+            Bet(player=Player(name="Benny", id_="eSbnubU-KP"), amount=75),
+            Call(player=Player(name="Chon", id_="bcp1N58-1M"), amount=900),
+            Raise(player=Player(name="Suk", id_="TfZNpyIPhD"), amount=900),
+            Fold(player=Player(name="Benny", id_="eSbnubU-KP")),
+            Check(player=Player(name="Russ", id_="PjBYO_8gbf")),
         ]
 
         for line, expected in zip(lines, expecteds):
             with self.subTest(line=line, expected=expected):
                 actual = parser.parse_action(line)
                 self.assertEqual(actual, expected)
+
+    def test_parse_hand(self):
+
+        hand_lines = [
+            '"-- starting hand #6  (No Limit Texas Hold\'em) (dealer: ""Eddy KGB @ _7OU6FzFZP"") --",2020-12-17T00:44:19.590Z,160816585959100',
+            '"Player stacks: #1 ""MOP @ jwf61y3XJg"" (1060) | #4 ""rus @ PjBYO_8gbf"" (971) | #6 ""Eddy KGB @ _7OU6FzFZP"" (1025) | #7 ""Ben @ eSbnubU-KP"" (1057) | #8 ""Max @ izsy1Zibpi"" (887)",2020-12-17T00:44:19.590Z,160816585959101',
+            '"Your hand is Q♠, 3♠",2020-12-17T00:44:19.590Z,160816585959105',
+            '"""Ben @ eSbnubU-KP"" posts a small blind of 5",2020-12-17T00:44:19.590Z,160816585959107',
+            '"""Max @ izsy1Zibpi"" posts a big blind of 10",2020-12-17T00:44:19.590Z,160816585959108',
+            '"""MOP @ jwf61y3XJg"" folds",2020-12-17T00:44:22.437Z,160816586243800',
+            '"""rus @ PjBYO_8gbf"" calls 10",2020-12-17T00:44:25.141Z,160816586514100',
+            '"""Eddy KGB @ _7OU6FzFZP"" calls 10",2020-12-17T00:44:28.601Z,160816586860200',
+            '"""Ben @ eSbnubU-KP"" calls 10",2020-12-17T00:44:31.296Z,160816587129700',
+            '"""Max @ izsy1Zibpi"" checks",2020-12-17T00:44:32.791Z,160816587279100',
+            '"flop:  [J♠, 10♥, 6♥]",2020-12-17T00:44:33.595Z,160816587359600',
+            '"""Ben @ eSbnubU-KP"" checks",2020-12-17T00:44:40.619Z,160816588062000',
+            '"""Max @ izsy1Zibpi"" checks",2020-12-17T00:44:41.477Z,160816588147800',
+            '"""rus @ PjBYO_8gbf"" checks",2020-12-17T00:44:44.131Z,160816588413200',
+            '"""Eddy KGB @ _7OU6FzFZP"" checks",2020-12-17T00:44:46.017Z,160816588601700',
+            '"turn: J♠, 10♥, 6♥ [Q♦]",2020-12-17T00:44:46.823Z,160816588682400',
+            '"""Ben @ eSbnubU-KP"" checks",2020-12-17T00:44:50.123Z,160816589012400',
+            '"""Max @ izsy1Zibpi"" checks",2020-12-17T00:44:57.859Z,160816589786000',
+            '"""rus @ PjBYO_8gbf"" checks",2020-12-17T00:44:59.202Z,160816589920300',
+            '"""Eddy KGB @ _7OU6FzFZP"" checks",2020-12-17T00:45:01.677Z,160816590167800',
+            '"river: J♠, 10♥, 6♥, Q♦ [3♣]",2020-12-17T00:45:02.499Z,160816590250400',
+            '"""Ben @ eSbnubU-KP"" bets 30",2020-12-17T00:45:08.970Z,160816590897100',
+            '"""Max @ izsy1Zibpi"" calls 30",2020-12-17T00:45:10.705Z,160816591070600',
+            '"""rus @ PjBYO_8gbf"" calls 30",2020-12-17T00:45:25.416Z,160816592541700',
+            '"""Eddy KGB @ _7OU6FzFZP"" folds",2020-12-17T00:45:26.287Z,160816592628700',
+            '"""Ben @ eSbnubU-KP"" shows a Q♠, 3♠.",2020-12-17T00:45:27.095Z,160816592709700',
+            '"""Ben @ eSbnubU-KP"" collected 130 from pot with Two Pair, Q\'s & 3\'s (combination: Q♠, Q♦, 3♠, 3♣, J♠)",2020-12-17T00:45:27.095Z,160816592709701',
+            '"-- ending hand #6 --",2020-12-17T00:45:27.095Z,160816592709702',
+        ]
+
+        expected_hand = Hand(
+            players={
+                Player(name="Eddy KGB", id_="_7OU6FzFZP"),
+                Player(name="MOP", id_="jwf61y3XJg"),
+                Player(name="rus", id_="PjBYO_8gbf"),
+                Player(name="Ben", id_="eSbnubU-KP"),
+                Player(name="Max", id_="izsy1Zibpi"),
+            },
+            our_cards=["3♠", "Q♠"],
+            preflop=Street(
+                actions=[
+                    Post(player=Player(name="Ben", id_="eSbnubU-KP"), amount=5),
+                    Post(player=Player(name="Max", id_="izsy1Zibpi"), amount=10),
+                    Fold(player=Player(name="MOP", id_="jwf61y3XJg")),
+                    Call(player=Player(name="rus", id_="PjBYO_8gbf"), amount=10),
+                    Call(player=Player(name="Eddy KGB", id_="_7OU6FzFZP"), amount=10),
+                    Call(player=Player(name="Ben", id_="eSbnubU-KP"), amount=10),
+                    Check(player=Player(name="Max", id_="izsy1Zibpi")),
+                ]
+            ),
+            flop=["J♠", " 10♥", " 6♥"],
+            first=Street(
+                actions=[
+                    Check(player=Player(name="Ben", id_="eSbnubU-KP")),
+                    Check(player=Player(name="Max", id_="izsy1Zibpi")),
+                    Check(player=Player(name="rus", id_="PjBYO_8gbf")),
+                    Check(player=Player(name="Eddy KGB", id_="_7OU6FzFZP")),
+                ]
+            ),
+            turn=["Q♦"],
+            second=Street(
+                actions=[
+                    Check(player=Player(name="Ben", id_="eSbnubU-KP")),
+                    Check(player=Player(name="Max", id_="izsy1Zibpi")),
+                    Check(player=Player(name="rus", id_="PjBYO_8gbf")),
+                    Check(player=Player(name="Eddy KGB", id_="_7OU6FzFZP")),
+                ]
+            ),
+            river=["3♣"],
+            third=Street(
+                actions=[
+                    Bet(player=Player(name="Ben", id_="eSbnubU-KP"), amount=30),
+                    Call(player=Player(name="Max", id_="izsy1Zibpi"), amount=30),
+                    Call(player=Player(name="rus", id_="PjBYO_8gbf"), amount=30),
+                    Fold(player=Player(name="Eddy KGB", id_="_7OU6FzFZP")),
+                ]
+            ),
+        )
+
+        actual_hand = parser.parse_hand(hand_lines=hand_lines)
+        self.assertEqual(actual_hand, expected_hand)
