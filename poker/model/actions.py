@@ -13,7 +13,7 @@ class Action:
         return f"{self.player.name} {self.__class__.__name__.lower()}s"
 
     def __repr__(self):
-        return f"{ self.__class__.__name__ }(player='{repr(self.player)}')"
+        return f"{ self.__class__.__name__ }(player={repr(self.player)})"
 
 
 class Check(Action):
@@ -33,7 +33,7 @@ class ActionWithAmount:
         return f"{self.player.name} {self.__class__.__name__.lower()}s {self.amount}"
 
     def __repr__(self):
-        return f"{ self.__class__.__name__ }(player='{repr(self.player)}', amount={self.amount})"
+        return f"{ self.__class__.__name__ }(player={repr(self.player)}, amount={self.amount})"
 
 
 class Bet(ActionWithAmount):

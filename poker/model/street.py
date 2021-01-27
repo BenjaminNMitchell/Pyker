@@ -16,7 +16,7 @@ class Street:
         return iter(self.actions)
 
     def __repr__(self):
-        return f"Street(action={repr(self.actions)})"
+        return f"Street(actions={repr(self.actions)})"
 
     def __str__(self):
         return "\n".join([str(action) for action in self.actions])
