@@ -67,8 +67,8 @@ class Card:
             raise ValueError(f"String: {string} must have 2 characters.")
 
         return Card(
-            suit=STRING_TO_SUIT_MAPPING[string[0]],
-            value=STRING_TO_VALUE_MAPPING[string[1]],
+            value=STRING_TO_VALUE_MAPPING[string[0]],
+            suit=STRING_TO_SUIT_MAPPING[string[1]],
         )
 
     def __str__(self):
