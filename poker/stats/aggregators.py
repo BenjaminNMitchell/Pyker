@@ -1,74 +1,77 @@
 """This module contains logic to calculate some common statisic for games."""
 
-import logging
+from typing import Dict
 
 import pandas as pd
-import numpy as np
 
 from poker.model.game import Game
+from poker.model.player import Player
 from poker.stats import indicators
+from poker.stats import metrics
 
 
-def get_game_stats(game: Game):
+def get_game_stats(game: Game) -> pd.DataFrame:
+    """Return the statistics from a Game of texas holdem"""
 
-    vpip = average_over_game(game.hands, indicators.get_vpip_players)
-    pre_flop_raise = average_over_game(game.hands, indicators.get_pfr_players)
-    aggression_factor = get_aggression_factor(game)
+    vpip = average_over_game(game, indicators.get_vpip_players)
+    pre_flop_raise = average_over_game(game, indicators.get_pfr_players)
+    hands_dealt = count_over_game(game, indicators.get_dealt_players)
+    aggression_factor = get_game_metric(game, metrics.get_aggression_factor)
 
-    stats = {"VPIP": vpip, "PFR": pre_flop_raise, "AF": aggression_factor}
-    df = pd.DataFrame(stats)
-    return df
+    stats = {
+        "Hands": hands_dealt,
+        "VPIP": vpip,
+        "PFR": pre_flop_raise,
+        "AF": aggression_factor,
+    }
+    df_stats = pd.DataFrame(stats)
+    return df_stats
 
 
-def average_over_game(hands, func):
+def count_over_game(game: Game, indicator: indicators.Indicator) -> Dict[Player, int]:
+    """
+    Return counts per player for occurences of an event defined buy
+    the supplied indicator function.
+    """
 
-    hands_in = {}
-    hands_with_stat = {}
+    counts = {player: 0 for player in game.players}
 
-    for hand in hands:
-        info = func(hand)
+    for hand in game.hands:
+        for player, _ in indicator(hand).items():
+            counts[player] += 1
 
-        for player, is_stat in info.items():
-            if player not in hands_in:
-                hands_in[player] = 0
+    return counts
 
-            hands_in[player] += 1
 
-            if player not in hands_with_stat:
-                hands_with_stat[player] = 0
+def average_over_game(
+    game: Game, indicator: indicators.Indicator
+) -> Dict[Player, float]:
+    """Average an indication over a game."""
+
+    game_metrics = {
+        player: metrics.Metric(numerator=0, denominator=0) for player in game.players
+    }
+
+    for hand in game.hands:
+        for player, is_stat in indicator(hand).items():
+            game_metrics[player].denominator += 1
 
             if is_stat:
-                hands_with_stat[player] += 1
+                game_metrics[player].numerator += 1
 
-    percentage_vpip = {}
-    for player in hands_in:
-        percentage_vpip[player] = hands_with_stat[player] / hands_in[player]
-
-    return percentage_vpip
+    return {player: metric.to_fraction() for player, metric in game_metrics.items()}
 
 
-def get_aggression_factor(game: Game):
-    game_aggressive_actions_counts = {player: 0 for player in game.players}
+def get_game_metric(game: Game, metricator: metrics.Metricator):
+    """Return a metric calculated over a game."""
+
+    game_metrics = {
+        player: metrics.Metric(numerator=0, denominator=0) for player in game.players
+    }
 
     for hand in game.hands:
-        for player, count in indicators.count_agressive_actions(hand).items():
-            game_aggressive_actions_counts[player] += count
+        hand_metrics = metricator(hand)
+        for player, metric in hand_metrics.items():
+            game_metrics[player] += metric
 
-    logging.debug("Game Aggressive Counts: %s", game_aggressive_actions_counts)
-    game_call_counts = {player: 0 for player in game.players}
-    for hand in game.hands:
-        for player, count in indicators.count_calls(hand).items():
-            game_call_counts[player] += count
-
-    logging.debug("Game Calls Counts: %s", game_call_counts)
-    aggression_factors = {player: None for player in game.players}
-    for player in game.players:
-        num_calls = game_call_counts[player]
-        num_aggresive = game_aggressive_actions_counts[player]
-
-        if num_calls == 0:
-            if num_aggresive > 0:
-                aggression_factors[player] = np.Inf
-        else:
-            aggression_factors[player] = num_aggresive / num_calls
-    return aggression_factors
+    return {player: metric.to_fraction() for player, metric in game_metrics.items()}

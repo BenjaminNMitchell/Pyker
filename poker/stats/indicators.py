@@ -1,49 +1,51 @@
-"""This module defines common queries of hands."""
+"""
+This module defines various indication functions for poker hands.
 
-from poker.model.actions import Bet, Raise, Call, Check
+An indication function is a function which that indicates which players have a given property.
+"""
+
+import typing
+
+from poker.model.actions import Bet, Raise, Call
+from poker.model.hand import Hand
+from poker.model.player import Player
 
 
-def get_vpip_players(hand):
+Indications = typing.Dict[Player, bool]
+Indicator = typing.NewType("Indicator", typing.Callable[[Hand], Indications])
+
+
+def get_vpip_players(hand: Hand) -> Indications:
+    """
+    Return an indication of the players that were VPIP for the hand.
+    Voluntary Put In Pot (VPIP) means the player volunteered to put money into the pot pre-flop.
+    """
+
     return _get_players_making_actions(hand.preflop, (Bet, Raise, Call))
 
 
-def get_pfr_players(hand):
+def get_pfr_players(hand: Hand) -> Indications:
+    """
+    Return an indication of the players that were PFR for the hand.
+
+    Pre Flop Raise (PFR) Means that the player raised the stakes preflop.
+    """
+
     return _get_players_making_actions(hand.preflop, (Bet, Raise))
 
 
-def _get_players_making_actions(actions, valid_types):
+def get_dealt_players(hand: Hand) -> Indications:
+    """
+    Return an indication of the players that were dealt into the hand.
+    """
+
+    return {player: True for player in hand.players}
+
+
+def _get_players_making_actions(street, valid_types):
     info = {}
-    for action in actions:
+    for action in street:
         is_volentary = isinstance(action, valid_types)
         if is_volentary or action.player not in info:
             info[action.player] = is_volentary
     return info
-
-
-def count_agressive_actions(hand):
-
-    return _count_actions_post_flop(hand, (Bet, Raise))
-
-def count_calls(hand):
-
-    return _count_actions_post_flop(hand, (Call))
-    
-
-
-def _count_actions_post_flop(hand, valid_types):
-
-    counts = {}
-
-    for street in [hand.first, hand.second, hand.third]:
-        if street is None:
-            break
-
-        for action in street:
-            if isinstance(action, valid_types):
-
-                if action.player not in counts:
-                    counts[action.player] = 1
-                else:
-                    counts[action.player] += 1
-
-    return counts
