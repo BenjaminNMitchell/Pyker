@@ -10,6 +10,8 @@ from poker.model import player
 
 @dataclass
 class Hand:
+    """A hand of texas holdem."""
+
     players: Set[player.Player]
     our_cards: Tuple[card.Card]
     preflop: street.Street

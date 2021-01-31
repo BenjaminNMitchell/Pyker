@@ -5,6 +5,8 @@ from dataclasses import dataclass
 
 @dataclass
 class Player:
+    """A player in a game of poker."""
+
     name: str
     id_: str
 

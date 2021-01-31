@@ -6,6 +6,8 @@ import enum
 
 
 class Suits(enum.Enum):
+    """A suit from a typical western deck of cards."""
+
     SPADES = 1
     HEARTS = 2
     CLUBS = 3
@@ -14,14 +16,20 @@ class Suits(enum.Enum):
 
 STRING_TO_SUIT_MAPPING = {
     "♠": Suits.SPADES,
+    "S": Suits.SPADES,
     "♣": Suits.CLUBS,
+    "C": Suits.CLUBS,
     "♥": Suits.HEARTS,
+    "H": Suits.HEARTS,
     "♦": Suits.DIAMONDS,
+    "D": Suits.DIAMONDS,
 }
 SUIT_TO_STRING_MAPPING = {v: k for k, v in STRING_TO_SUIT_MAPPING.items()}
 
 
 class Values(enum.Enum):
+    """A value from a typical western deck of cards."""
+
     TWO = 1
     THREE = 2
     FOUR = 3
@@ -57,12 +65,14 @@ VALUE_TO_STRING_MAPPING = {v: k for k, v in STRING_TO_VALUE_MAPPING.items()}
 
 @dataclass
 class Card:
+    """A playing card from a typical western deck of cards."""
+
     suit: Suits
     value: Values
 
     @staticmethod
     def from_string(string):
-
+        """Parse a Card Object from it's string representation"""
         if len(string) != 2:
             raise ValueError(f"String: {string} must have 2 characters.")
 

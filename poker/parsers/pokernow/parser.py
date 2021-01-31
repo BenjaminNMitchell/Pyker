@@ -48,9 +48,11 @@ def get_hand_index_ranges(lines):
     return list(zip(hand_start_indices, hand_end_indices))
 
 
-def get_hand(indices, game):
+def get_hand(indices, game_lines):
+    """Return a subset of the game between the supplied indices."""
+
     hand_start_index, hand_end_index = indices
-    return game[hand_start_index : hand_end_index + 1]
+    return game_lines[hand_start_index : hand_end_index + 1]
 
 
 def parse_hand(hand_lines):
@@ -156,6 +158,8 @@ PLAYER_STACK_REGEX = re.compile(
 
 
 def parse_players(line):
+    """Parse the players from a hand."""
+
     players, _, _ = line.split(",")
     players = players[1:-1].replace("Player stacks: ", "")
     players = players.split("|")
@@ -173,7 +177,7 @@ def parse_players(line):
 
 
 def parse_street(hand, i, term_keyword):
-
+    """Parse a street of betting."""
     actions = []
 
     while True:
@@ -198,6 +202,7 @@ ACTION_REGEX = re.compile(ACTION_REGEX_STR)
 
 
 def parse_action(line):
+    """Parse the supplied line as a playe action"""
 
     action_string, _, _ = line.split(",")
 
@@ -214,26 +219,25 @@ def parse_action(line):
 
         amount = int(match.group(7).strip())
 
-    if "posts" in line:
-        return actions.Post(player=action_player, amount=amount)
+        if "posts" in line:
+            return actions.Post(player=action_player, amount=amount)
 
-    elif "bets" in line:
-        return actions.Bet(player=action_player, amount=amount)
+        if "bets" in line:
+            return actions.Bet(player=action_player, amount=amount)
 
-    elif "raises" in line:
-        return actions.Raise(player=action_player, amount=amount)
+        if "raises" in line:
+            return actions.Raise(player=action_player, amount=amount)
 
-    elif "calls" in line:
-        return actions.Call(player=action_player, amount=amount)
+        if "calls" in line:
+            return actions.Call(player=action_player, amount=amount)
 
-    elif "checks" in line:
+    if "checks" in line:
         return actions.Check(player=action_player)
 
-    elif "folds" in line:
+    if "folds" in line:
         return actions.Fold(player=action_player)
 
-    else:
-        raise ValueError("Error parsing action: line")
+    raise ValueError("Error parsing line {line} as action")
 
 
 def is_action(line: str) -> bool:

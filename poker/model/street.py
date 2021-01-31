@@ -8,7 +8,7 @@ from poker.model import actions
 
 @dataclass
 class Street:
-    """A Street is defined as a round of betting which consists of a collection of player actions."""
+    """A Street is defined as a round of betting which consists of a list of player actions."""
 
     actions: List[Union[actions.ActionWithAmount, actions.Action]]
 
