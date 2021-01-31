@@ -25,4 +25,7 @@ cd Pyker
 
 # Install dev dependencies from lock file
 pipenv install --deploy --dev
+
+# Run static checks
+make static-checks
 ```
