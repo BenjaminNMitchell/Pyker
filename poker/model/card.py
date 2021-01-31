@@ -15,14 +15,14 @@ class Suits(enum.Enum):
 
 
 STRING_TO_SUIT_MAPPING = {
-    "♠": Suits.SPADES,
     "S": Suits.SPADES,
-    "♣": Suits.CLUBS,
+    "♠": Suits.SPADES,
     "C": Suits.CLUBS,
-    "♥": Suits.HEARTS,
+    "♣": Suits.CLUBS,
     "H": Suits.HEARTS,
-    "♦": Suits.DIAMONDS,
+    "♥": Suits.HEARTS,
     "D": Suits.DIAMONDS,
+    "♦": Suits.DIAMONDS,
 }
 SUIT_TO_STRING_MAPPING = {v: k for k, v in STRING_TO_SUIT_MAPPING.items()}
 
@@ -73,6 +73,7 @@ class Card:
     @staticmethod
     def from_string(string):
         """Parse a Card Object from it's string representation"""
+
         if len(string) != 2:
             raise ValueError(f"String: {string} must have 2 characters.")
 

@@ -12,3 +12,7 @@ lint:
 
 check-format:
 	pipenv run black --check .
+
+report-coverage:
+	pipenv run coverage run --source=poker,test -m unittest discover
+	pipenv run coverage report -m 
