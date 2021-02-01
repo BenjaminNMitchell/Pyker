@@ -8,6 +8,7 @@ from poker.model import street
 from poker.model import hand
 from poker.model import game
 from poker.model import player
+from poker.model import card
 
 ACTIONS = ["posts", "bets", "raises", "calls", "checks", "folds"]
 FLOP_MARKER = "flop:"
@@ -26,10 +27,16 @@ def parse_game(game_data):
     hand_line_ranges = get_hand_index_ranges(lines)
 
     logging.debug("Parsing hands")
-    hands = [parse_hand(get_hand(r, lines)) for r in hand_line_ranges]
+    hands = []
+    try:
+        for r in hand_line_ranges:
+            hands.append(parse_hand(get_hand(r, lines)))
 
-    logging.debug("Parsing Game")
-    return game.Game(hands=hands)
+        logging.debug("Parsing Game")
+        return game.Game(hands=hands)
+
+    except Exception as err:
+        raise ValueError(f"Couldn't parse game hand in range: {r} error: {err}")
 
 
 def get_hand_index_ranges(lines):
@@ -57,6 +64,7 @@ def get_hand(indices, game_lines):
 
 def parse_hand(hand_lines):
 
+    # TODO filter out any lines that aren't part of the game `the player requested...` `the admin...`
     i = 0
     while "Player stacks" not in hand_lines[i]:
         i += 1
@@ -64,13 +72,9 @@ def parse_hand(hand_lines):
     players = parse_players(hand_lines[i])
     i += 1
 
-    our_cards = [
-        c.strip()
-        for c in sorted(
-            hand_lines[i].split('"')[1].replace("Your hand is ", "").split(",")
-        )
-    ]
-    i += 1
+    our_cards = parse_our_cards(hand_lines[i])
+    if our_cards is not None:
+        i += 1
 
     preflop, i = parse_street(hand_lines, i, FLOP_MARKER)
 
@@ -143,10 +147,30 @@ def parse_hand(hand_lines):
     )
 
 
+CARD_REGEX_STR = r"[AKQJ1-9]{1}0?[♥♣♠♦]"
+CARD_REGEX = re.compile(CARD_REGEX_STR)
+
+HAND_REGEX_STR = f'"Your hand is ({CARD_REGEX_STR}), ({CARD_REGEX_STR})".*'
+HAND_REGEX = re.compile(HAND_REGEX_STR)
+
+
+def parse_our_cards(line):
+
+    match = HAND_REGEX.match(line)
+
+    if match is None:
+        return None
+
+    return (
+        card.Card.from_string(match.group(1)),
+        card.Card.from_string(match.group(2)),
+    )
+
+
 def parse_cards(line):
 
-    flop_cards = line[line.find("[") + 1 : line.rfind("]")]
-    return flop_cards.split(",")
+    cards = line[line.find("[") + 1 : line.rfind("]")]
+    return [card.Card.from_string(c.strip()) for c in cards.split(",")]
 
 
 PLAYER_REGEX_STR = r'""([-_a-zA-Z0-9 ]+?) @ ([-_0-9a-zA-Z_]{10})""'

@@ -6,6 +6,7 @@ from poker.model.actions import Bet, Call, Fold, Check, Post, Raise
 from poker.model.player import Player
 from poker.model.hand import Hand
 from poker.model.street import Street
+from poker.model.card import Card
 from poker.parsers.pokernow import parser
 
 
@@ -106,7 +107,7 @@ class ParserTests(unittest.TestCase):
                 Player(name="Ben", id_="eSbnubU-KP"),
                 Player(name="Max", id_="izsy1Zibpi"),
             },
-            our_cards=["3♠", "Q♠"],
+            our_cards=(Card.from_string("Q♠"), Card.from_string("3♠")),
             preflop=Street(
                 actions=[
                     Post(player=Player(name="Ben", id_="eSbnubU-KP"), amount=5),
@@ -118,7 +119,11 @@ class ParserTests(unittest.TestCase):
                     Check(player=Player(name="Max", id_="izsy1Zibpi")),
                 ]
             ),
-            flop=["J♠", " 10♥", " 6♥"],
+            flop=[
+                Card.from_string("J♠"),
+                Card.from_string("10♥"),
+                Card.from_string("6♥"),
+            ],
             first=Street(
                 actions=[
                     Check(player=Player(name="Ben", id_="eSbnubU-KP")),
@@ -127,7 +132,7 @@ class ParserTests(unittest.TestCase):
                     Check(player=Player(name="Eddy KGB", id_="_7OU6FzFZP")),
                 ]
             ),
-            turn=["Q♦"],
+            turn=[Card.from_string("Q♦")],
             second=Street(
                 actions=[
                     Check(player=Player(name="Ben", id_="eSbnubU-KP")),
@@ -136,7 +141,7 @@ class ParserTests(unittest.TestCase):
                     Check(player=Player(name="Eddy KGB", id_="_7OU6FzFZP")),
                 ]
             ),
-            river=["3♣"],
+            river=[Card.from_string("3♣")],
             third=Street(
                 actions=[
                     Bet(player=Player(name="Ben", id_="eSbnubU-KP"), amount=30),
@@ -147,5 +152,7 @@ class ParserTests(unittest.TestCase):
             ),
         )
 
+        self.maxDiff = None
         actual_hand = parser.parse_hand(hand_lines=hand_lines)
+
         self.assertEqual(actual_hand, expected_hand)
