@@ -44,6 +44,10 @@ class Values(enum.Enum):
     KING = 12
     ACE = 13
 
+    def __lt__(self, other):
+        if self.__class__ is other.__class__:
+            return self.value < other.value
+
 
 STRING_TO_VALUE_MAPPING = {
     "2": Values.TWO,
@@ -74,15 +78,34 @@ class Card:
     def from_string(string):
         """Parse a Card Object from it's string representation"""
 
-        if len(string) != 2:
-            raise ValueError(f"String: {string} must have 2 characters.")
+        if len(string) == 2:
+            value = string[0]
+        elif len(string) == 3:
+            value = string[:2]
+        else:
+            raise ValueError(f"cannot parse card from {repr(string)} invalid length")
+
+        suit = string[-1]
+
+        if (value not in STRING_TO_VALUE_MAPPING) or (
+            suit not in STRING_TO_SUIT_MAPPING
+        ):
+            raise ValueError(
+                f"cannot parse card from string {repr(string)} invalid characters"
+            )
 
         return Card(
-            value=STRING_TO_VALUE_MAPPING[string[0]],
-            suit=STRING_TO_SUIT_MAPPING[string[1]],
+            value=STRING_TO_VALUE_MAPPING[value],
+            suit=STRING_TO_SUIT_MAPPING[suit],
         )
 
     def __str__(self):
         return (
             f"{VALUE_TO_STRING_MAPPING[self.value]}{SUIT_TO_STRING_MAPPING[self.suit]}"
         )
+
+    def __lt__(self, other):
+        if not isinstance(other, Card):
+            raise ValueError(f"< is not defined between Card and {type(other)}")
+
+        return self.value < other.value
