@@ -173,7 +173,7 @@ def parse_cards(line):
     return [card.Card.from_string(c.strip()) for c in cards.split(",")]
 
 
-PLAYER_REGEX_STR = r'""([-_a-zA-Z0-9 ]+?) @ ([-_0-9a-zA-Z_]{10})""'
+PLAYER_REGEX_STR = r'''""([-_a-zA-Z0-9' ]+?) @ ([-_0-9a-zA-Z_]{10})""'''
 PLAYER_REGEX = re.compile(PLAYER_REGEX_STR)
 
 PLAYER_STACK_REGEX = re.compile(
