@@ -10,7 +10,7 @@ from poker.model import game
 from poker.model import player
 from poker.model import card
 
-ACTIONS = ["posts", "bets", "raises", "calls", "checks", "folds"]
+ACTIONS = ["posts", "bets", "raises", "calls", "checks", "folds", "collected"]
 FLOP_MARKER = "flop:"
 TURN_MARKER = "turn:"
 RIVER_MARKER = "river:"
@@ -228,7 +228,7 @@ ACTION_REGEX = re.compile(ACTION_REGEX_STR)
 def parse_action(line):
     """Parse the supplied line as a playe action"""
 
-    action_string, _, _ = line.split(",")
+    action_string, _, _ = line.rsplit(",", 2)
 
     match = ACTION_REGEX.search(action_string)
     if match is None:
@@ -237,7 +237,7 @@ def parse_action(line):
     action_player = player.Player(name=match.group(1), id_=match.group(2))
     action = match.group(3)
 
-    if action in ("bets", "posts", "raises", "calls"):
+    if action in ("bets", "posts", "raises", "calls", "collected"):
         if match.group(7) is None:
             raise ValueError(f"Couldn't parse actionWithAmount from: {action_string}")
 
@@ -254,6 +254,9 @@ def parse_action(line):
 
         if "calls" in line:
             return actions.Call(player=action_player, amount=amount)
+        
+        if "collected" in line:
+            return actions.Collect(player=action_player, amount=amount)
 
     if "checks" in line:
         return actions.Check(player=action_player)

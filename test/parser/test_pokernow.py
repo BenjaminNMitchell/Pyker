@@ -2,7 +2,7 @@
 
 import unittest
 
-from poker.model.actions import Bet, Call, Fold, Check, Post, Raise
+from poker.model.actions import Bet, Call, Fold, Check, Post, Raise, Collect
 from poker.model.player import Player
 from poker.model.hand import Hand
 from poker.model.street import Street
@@ -148,6 +148,7 @@ class ParserTests(unittest.TestCase):
                     Call(player=Player(name="Max", id_="izsy1Zibpi"), amount=30),
                     Call(player=Player(name="rus", id_="PjBYO_8gbf"), amount=30),
                     Fold(player=Player(name="Eddy KGB", id_="_7OU6FzFZP")),
+                    Collect(player=Player(name="Ben", id_="eSbnubU-KP"), amount=130),
                 ]
             ),
         )

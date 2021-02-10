@@ -66,3 +66,9 @@ class Call(ActionWithAmount):  # pylint: disable=too-few-public-methods
     A call action which signifies the player added chips to the pot to match
     a bet or raise.
     """
+
+class Collect(ActionWithAmount): # pylint: disable=too-few-public-methods
+    """
+    A call action which signifies the player added chips to the pot to match
+    a bet or raise.
+    """
