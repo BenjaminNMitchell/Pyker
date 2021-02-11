@@ -157,3 +157,10 @@ class ParserTests(unittest.TestCase):
         actual_hand = parser.parse_hand(hand_lines=hand_lines)
 
         self.assertEqual(actual_hand, expected_hand)
+
+
+    def test_parse_straddle_action(self):
+        line = '"""Benny @ jzQ-urBlJX"" posts a straddle of 20",2021-02-11T02:41:46.355Z,161301130635712'
+        actual = parser. parse_action(line)
+        expected = Post(player=Player(name="Benny", id_="jzQ-urBlJX"), amount=20)
+        self.assertEqual(actual, expected)
