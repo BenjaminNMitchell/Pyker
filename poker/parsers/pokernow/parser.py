@@ -237,9 +237,16 @@ def parse_action(line):
     action_player = player.Player(name=match.group(1), id_=match.group(2))
     action = match.group(3)
 
+
+    if "posts a straddle" in line:
+        print(match.group(7))
+
+        amount = int("0")
+        return actions.Post(player=action_player, amount=amount)
+
     if action in ("bets", "posts", "raises", "calls"):
         if match.group(7) is None:
-            raise ValueError(f"Couldn't parse actionWithAmount from: {action_string}")
+           raise ValueError(f"Couldn't parse actionWithAmount from: {action_string} considered as {action}")
 
         amount = int(match.group(7).strip())
 
@@ -261,7 +268,7 @@ def parse_action(line):
     if "folds" in line:
         return actions.Fold(player=action_player)
 
-    raise ValueError("Error parsing line {line} as action")
+    raise ValueError(f"Error parsing line {line} as {action}")
 
 
 def is_action(line: str) -> bool:
