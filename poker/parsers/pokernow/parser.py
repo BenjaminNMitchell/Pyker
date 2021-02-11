@@ -221,7 +221,7 @@ def parse_street(hand, i, term_keyword):
     return street.Street(actions), i
 
 
-ACTION_REGEX_STR = f'"{PLAYER_REGEX_STR} ({"|".join(ACTIONS)})( a (missed )?big blind of| a (missing )?small blind of| to)?( [1-9][0-9]*)?'
+ACTION_REGEX_STR = f'"{PLAYER_REGEX_STR} ({"|".join(ACTIONS)})( a (missed )?big blind of| a (missing )?small blind of| to| a straddle of)?( [1-9][0-9]*)?'
 ACTION_REGEX = re.compile(ACTION_REGEX_STR)
 
 
@@ -236,13 +236,6 @@ def parse_action(line):
 
     action_player = player.Player(name=match.group(1), id_=match.group(2))
     action = match.group(3)
-
-
-    if "posts a straddle" in line:
-        print(match.group(7))
-
-        amount = int("0")
-        return actions.Post(player=action_player, amount=amount)
 
     if action in ("bets", "posts", "raises", "calls"):
         if match.group(7) is None:
