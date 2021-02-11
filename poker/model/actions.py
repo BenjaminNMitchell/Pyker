@@ -1,6 +1,7 @@
 """This module contains different player actions."""
 
 from dataclasses import dataclass
+from typing import Tuple
 
 from poker.model.player import Player
 
@@ -69,6 +70,18 @@ class Call(ActionWithAmount):  # pylint: disable=too-few-public-methods
 
 class Collect(ActionWithAmount): # pylint: disable=too-few-public-methods
     """
-    A call action which signifies the player added chips to the pot to match
-    a bet or raise.
+    A call action which signifies the player added the pot to their stack.
+    """
+
+
+@dataclass 
+class ActionWithCards:
+
+    player: Player
+    cards: Tuple[card.Card]
+    
+    #TODO str() and repr()
+    
+    """
+    a generic action that associates player with cards.
     """
