@@ -85,3 +85,9 @@ class ActionWithCards:
     """
     a generic action that associates player with cards.
     """
+
+
+class Show (ActionWithCards):
+    """
+    A show action which signifies the player revealed their cards.
+    """
