@@ -38,10 +38,9 @@ class Metric:
 
 
 Metrics = typing.NewType("Metrics", typing.Dict[Player, Metric])
-Metricator = typing.NewType("Metricator", typing.Callable[[Hand], Metrics])
 
 
-def get_aggression_factor(hand: Hand) -> Metric:
+def get_aggression_factor(hand: Hand) -> Metrics:
     """Return a metric representation of each players Agression Factor."""
 
     aggressive_counts = _count_actions_post_flop(hand, (Bet, Raise))
@@ -53,7 +52,7 @@ def get_aggression_factor(hand: Hand) -> Metric:
             numerator=aggressive_counts[player], denominator=passive_counts[player]
         )
 
-    return metrics
+    return Metrics(metrics)
 
 
 def _count_actions_post_flop(hand, valid_types):

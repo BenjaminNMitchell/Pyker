@@ -12,7 +12,6 @@ from poker.model.player import Player
 
 
 Indications = typing.Dict[Player, bool]
-Indicator = typing.NewType("Indicator", typing.Callable[[Hand], Indications])
 
 
 def get_vpip_players(hand: Hand) -> Indications:
