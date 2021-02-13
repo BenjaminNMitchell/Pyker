@@ -44,7 +44,7 @@ def get_aggression_factor(hand: Hand) -> Metrics:
     """Return a metric representation of each players Agression Factor."""
 
     aggressive_counts = _count_actions_post_flop(hand, (Bet, Raise))
-    passive_counts = _count_actions_post_flop(hand, (Call))
+    passive_counts = _count_actions_post_flop(hand, (Call,))
 
     metrics = {}
     for player in hand.players:
@@ -55,7 +55,7 @@ def get_aggression_factor(hand: Hand) -> Metrics:
     return Metrics(metrics)
 
 
-def _count_actions_post_flop(hand, valid_types):
+def _count_actions_post_flop(hand: Hand, valid_types: typing.Tuple) -> typing.Dict:
 
     counts = {player: 0 for player in hand.players}
 

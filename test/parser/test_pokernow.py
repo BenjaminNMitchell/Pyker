@@ -11,7 +11,10 @@ from poker.parsers.pokernow import parser
 
 
 class ParserTests(unittest.TestCase):
+    """Tests for the poker now parser."""
+
     def test_get_players(self):
+        """Test that get_players correctly parses the players line."""
 
         test_player_lines = (
             '"Player stacks: '
@@ -37,11 +40,17 @@ class ParserTests(unittest.TestCase):
         self.assertEqual(actual, expected)
 
     def test_get_actions(self):
+        """Test that get_actions correctly parses actions."""
+
         lines = [
-            '"""Russ @ PjBYO_8gbf"" posts a small blind of 10",2021-01-09T18:14:11.908Z,161021605191410',
-            '"""Chon @ bcp1N58-1M"" posts a big blind of 20",2021-01-09T18:14:11.908Z,161021605191411',
-            '"""Russ @ PjBYO_8gbf"" posts a missing small blind of 10",2021-01-09T18:00:04.745Z,161021520474800',
-            '"""Russ @ PjBYO_8gbf"" posts a missed big blind of 20",2021-01-09T18:00:04.745Z,161021520474800',
+            '"""Russ @ PjBYO_8gbf"" posts a small blind of 10"'
+            ",2021-01-09T18:14:11.908Z,161021605191410",
+            '"""Chon @ bcp1N58-1M"" posts a big blind of 20"'
+            ",2021-01-09T18:14:11.908Z,161021605191411",
+            '"""Russ @ PjBYO_8gbf"" posts a missing small blind of 10"'
+            ",2021-01-09T18:00:04.745Z,161021520474800",
+            '"""Russ @ PjBYO_8gbf"" posts a missed big blind of 20"'
+            ",2021-01-09T18:00:04.745Z,161021520474800",
             '"""Benny @ eSbnubU-KP"" bets 75",2021-01-09T18:13:55.591Z,161021603559200',
             '"""Chon @ bcp1N58-1M"" calls 900",2021-01-09T18:16:22.467Z,161021618246800',
             '"""Suk @ TfZNpyIPhD"" raises to 900",2021-01-09T18:16:07.502Z,161021616750300',
@@ -67,13 +76,19 @@ class ParserTests(unittest.TestCase):
                 self.assertEqual(actual, expected)
 
     def test_parse_hand(self):
+        """Test that parse_hand correctly parses the hand."""
 
         hand_lines = [
-            '"-- starting hand #6  (No Limit Texas Hold\'em) (dealer: ""Eddy KGB @ _7OU6FzFZP"") --",2020-12-17T00:44:19.590Z,160816585959100',
-            '"Player stacks: #1 ""MOP @ jwf61y3XJg"" (1060) | #4 ""rus @ PjBYO_8gbf"" (971) | #6 ""Eddy KGB @ _7OU6FzFZP"" (1025) | #7 ""Ben @ eSbnubU-KP"" (1057) | #8 ""Max @ izsy1Zibpi"" (887)",2020-12-17T00:44:19.590Z,160816585959101',
+            '"-- starting hand #6  (No Limit Texas Hold\'em) (dealer: ""Eddy KGB @ _7OU6FzFZP"")'
+            ' --",2020-12-17T00:44:19.590Z,160816585959100',
+            '"Player stacks: #1 ""MOP @ jwf61y3XJg"" (1060) | #4 ""rus @ PjBYO_8gbf"" (971) |'
+            ' #6 ""Eddy KGB @ _7OU6FzFZP"" (1025) | #7 ""Ben @ eSbnubU-KP"" (1057) | #8'
+            ' ""Max @ izsy1Zibpi"" (887)",2020-12-17T00:44:19.590Z,160816585959101',
             '"Your hand is Q♠, 3♠",2020-12-17T00:44:19.590Z,160816585959105',
-            '"""Ben @ eSbnubU-KP"" posts a small blind of 5",2020-12-17T00:44:19.590Z,160816585959107',
-            '"""Max @ izsy1Zibpi"" posts a big blind of 10",2020-12-17T00:44:19.590Z,160816585959108',
+            '"""Ben @ eSbnubU-KP"" posts a small blind of 5",'
+            "2020-12-17T00:44:19.590Z,160816585959107",
+            '"""Max @ izsy1Zibpi"" posts a big blind of 10",'
+            "2020-12-17T00:44:19.590Z,160816585959108",
             '"""MOP @ jwf61y3XJg"" folds",2020-12-17T00:44:22.437Z,160816586243800',
             '"""rus @ PjBYO_8gbf"" calls 10",2020-12-17T00:44:25.141Z,160816586514100',
             '"""Eddy KGB @ _7OU6FzFZP"" calls 10",2020-12-17T00:44:28.601Z,160816586860200',
@@ -95,7 +110,8 @@ class ParserTests(unittest.TestCase):
             '"""rus @ PjBYO_8gbf"" calls 30",2020-12-17T00:45:25.416Z,160816592541700',
             '"""Eddy KGB @ _7OU6FzFZP"" folds",2020-12-17T00:45:26.287Z,160816592628700',
             '"""Ben @ eSbnubU-KP"" shows a Q♠, 3♠.",2020-12-17T00:45:27.095Z,160816592709700',
-            '"""Ben @ eSbnubU-KP"" collected 130 from pot with Two Pair, Q\'s & 3\'s (combination: Q♠, Q♦, 3♠, 3♣, J♠)",2020-12-17T00:45:27.095Z,160816592709701',
+            '"""Ben @ eSbnubU-KP"" collected 130 from pot with Two Pair, Q\'s & 3\'s'
+            ' (combination: Q♠, Q♦, 3♠, 3♣, J♠)",2020-12-17T00:45:27.095Z,160816592709701',
             '"-- ending hand #6 --",2020-12-17T00:45:27.095Z,160816592709702',
         ]
 
@@ -153,7 +169,6 @@ class ParserTests(unittest.TestCase):
             ),
         )
 
-        self.maxDiff = None
         actual_hand = parser.parse_hand(hand_lines=hand_lines)
 
         self.assertEqual(actual_hand, expected_hand)
