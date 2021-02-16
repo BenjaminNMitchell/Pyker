@@ -4,7 +4,7 @@ from dataclasses import dataclass
 from typing import Tuple
 
 from poker.model.player import Player
-
+from poker.model.card import Card
 
 @dataclass
 class Action:
@@ -70,7 +70,15 @@ class Call(ActionWithAmount):  # pylint: disable=too-few-public-methods
 
 class Collect(ActionWithAmount): # pylint: disable=too-few-public-methods
     """
-    A call action which signifies the player added the pot to their stack.
+    A call action which signifies the player added the chips the pot
+    pot to their stack after winning the pot.
+    """
+
+
+class Return(ActionWithAmount): # pylint: disable=too-few-public-methods
+    """
+    A return action which signifies the player was returned 
+    their uncontested bet. 
     """
 
 
@@ -78,7 +86,7 @@ class Collect(ActionWithAmount): # pylint: disable=too-few-public-methods
 class ActionWithCards:
 
     player: Player
-    cards: Tuple[card.Card]
+    cards: Tuple[Card]
     
     #TODO str() and repr()
     
