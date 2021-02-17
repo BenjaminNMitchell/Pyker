@@ -2,7 +2,7 @@
 
 import unittest
 
-from poker.model.actions import Bet, Call, Fold, Check, Post, Raise
+from poker.model.actions import Bet, Call, Fold, Check, Post, Raise, Collect, Return
 from poker.model.player import Player
 from poker.model.hand import Hand
 from poker.model.street import Street
@@ -148,6 +148,7 @@ class ParserTests(unittest.TestCase):
                     Call(player=Player(name="Max", id_="izsy1Zibpi"), amount=30),
                     Call(player=Player(name="rus", id_="PjBYO_8gbf"), amount=30),
                     Fold(player=Player(name="Eddy KGB", id_="_7OU6FzFZP")),
+                    Collect(player=Player(name="Ben", id_="eSbnubU-KP"), amount=130),
                 ]
             ),
         )
@@ -156,3 +157,17 @@ class ParserTests(unittest.TestCase):
         actual_hand = parser.parse_hand(hand_lines=hand_lines)
 
         self.assertEqual(actual_hand, expected_hand)
+
+
+    def test_parse_straddle_action(self):
+        line = '"""Benny @ jzQ-urBlJX"" posts a straddle of 20",2021-02-11T02:41:46.355Z,161301130635712'
+        actual = parser.parse_action(line)
+        expected = Post(player=Player(name="Benny", id_="jzQ-urBlJX"), amount=20)
+        self.assertEqual(actual, expected)
+
+
+    def test_parse_returned_bet(self):
+        line = '"Uncalled bet of 66 returned to ""Oven @ hogtf8AO2o""",2021-02-11T02:41:46.355Z,161301130635712'
+        actual = parser.parse_action(line)
+        expected = Return(player=Player(name="Oven", id_="hogtf8AO2o"), amount=66)
+        self.assertEqual(actual, expected)
