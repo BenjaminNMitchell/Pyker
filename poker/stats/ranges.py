@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+from poker.stats import filters
 
 from poker.model import card
 
@@ -36,11 +37,16 @@ class HandType:
         return f"{top_str}-{bottom_str}{suited}"
 
 
-def get_game_range(game):
+def get_game_range(game, filter_func=None):
 
     hand_ranges = {}
 
-    for hand in game.hands:
+    if filter_func is None:
+        hands = game.hands
+    else:
+        hands = filter(filter_func, game.hands)
+
+    for hand in hands:
         if hand.our_cards is not None:
             hand_type = get_hand_type(hand.our_cards)
             if hand_type not in hand_ranges:
