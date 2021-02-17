@@ -1,11 +1,12 @@
 """This module contains logic to calculate some common statisic for games."""
 
-from typing import Dict
+from typing import Dict, Callable
 
 import pandas as pd
 
 from poker.model.game import Game
 from poker.model.player import Player
+from poker.model.hand import Hand
 from poker.stats import indicators
 from poker.stats import metrics
 
@@ -28,7 +29,9 @@ def get_game_stats(game: Game) -> pd.DataFrame:
     return df_stats
 
 
-def count_over_game(game: Game, indicator: indicators.Indicator) -> Dict[Player, int]:
+def count_over_game(
+    game: Game, indicator: Callable[[Hand], indicators.Indications]
+) -> Dict[Player, int]:
     """
     Return counts per player for occurences of an event defined buy
     the supplied indicator function.
@@ -44,7 +47,7 @@ def count_over_game(game: Game, indicator: indicators.Indicator) -> Dict[Player,
 
 
 def average_over_game(
-    game: Game, indicator: indicators.Indicator
+    game: Game, indicator: Callable[[Hand], indicators.Indications]
 ) -> Dict[Player, float]:
     """Average an indication over a game."""
 
@@ -62,7 +65,7 @@ def average_over_game(
     return {player: metric.to_fraction() for player, metric in game_metrics.items()}
 
 
-def get_game_metric(game: Game, metricator: metrics.Metricator):
+def get_game_metric(game: Game, metricator: Callable[[Hand], metrics.Metrics]):
     """Return a metric calculated over a game."""
 
     game_metrics = {

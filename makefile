@@ -1,7 +1,7 @@
 
 .PHONY: static-checks test lint check-format
 
-static-checks: test lint check-format
+static-checks: test check-format lint check-types
 
 test:
 	pipenv run python -m unittest discover
@@ -12,6 +12,9 @@ lint:
 
 check-format:
 	pipenv run black --check .
+
+check-types:
+	pipenv run mypy poker
 
 report-coverage:
 	pipenv run coverage run --source=poker,test -m unittest discover

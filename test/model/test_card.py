@@ -6,7 +6,10 @@ from poker.model import card
 
 
 class CardTests(unittest.TestCase):
+    """Test the card class."""
+
     def test_from_string(self):
+        """Test from_string constructs cards correctly."""
 
         test_cases = [
             {
@@ -61,6 +64,7 @@ class CardTests(unittest.TestCase):
             _ = card.Card.from_string("K♥1")
 
     def test_str(self):
+        """Test that str produces the correct string."""
 
         test_cases = [
             {
@@ -89,6 +93,7 @@ class CardTests(unittest.TestCase):
                 self.assertEqual(actual, expected)
 
     def test_is_sortable(self):
+        """Test that cards are sortable."""
 
         cards = [
             card.Card(suit=card.Suits.CLUBS, value=card.Values.KING),
@@ -126,6 +131,7 @@ class CardTests(unittest.TestCase):
         self.assertEqual(actual, expected)
 
     def test_lt(self):
+        """Test the less than method functions correctly."""
 
         ace_of_clubs = card.Card(value=card.Values.ACE, suit=card.Suits.CLUBS)
         ace_of_spades = card.Card(value=card.Values.ACE, suit=card.Suits.SPADES)
