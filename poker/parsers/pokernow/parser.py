@@ -224,20 +224,23 @@ def parse_street(hand, i, term_keyword):
 ACTION_REGEX_STR = f'"{PLAYER_REGEX_STR} ({"|".join(ACTIONS)})( a (missed )?big blind of| a (missing )?small blind of| to| a straddle of)?( [1-9][0-9]*)?'
 ACTION_REGEX = re.compile(ACTION_REGEX_STR)
 
-UNCALLED_REGEX_STR = f'(Uncalled bet of)( [1-9][0-9]*)( returned to) {PLAYER_REGEX_STR}'
+UNCALLED_REGEX_STR = f"(Uncalled bet of)( [1-9][0-9]*)( returned to) {PLAYER_REGEX_STR}"
 UNCALLED_REGEX = re.compile(UNCALLED_REGEX_STR)
+
 
 def parse_action(line):
     """Parse the supplied line as a player action"""
 
     action_string, _, _ = line.rsplit(",", 2)
 
-    if 'Uncalled' in line:
+    if "Uncalled" in line:
         match = UNCALLED_REGEX.search(action_string)
         if match == None:
-            raise ValueError(f'Could not parse action string: {action_string} as return action')
+            raise ValueError(
+                f"Could not parse action string: {action_string} as return action"
+            )
 
-        action_player = player.Player(name=match.group(4) , id_=(match.group(5)))
+        action_player = player.Player(name=match.group(4), id_=(match.group(5)))
         amount = int(match.group(2).strip())
         return actions.Return(player=action_player, amount=amount)
 
@@ -245,9 +248,7 @@ def parse_action(line):
     if match is None:
         raise ValueError(f"Could not parse action string: {action_string}")
 
-    
     action = match.group(3)
-
 
     if action in ("bets", "posts", "raises", "calls", "collected", "checks", "folds"):
         action_player = player.Player(name=match.group(1), id_=match.group(2))
@@ -256,10 +257,12 @@ def parse_action(line):
             return actions.Check(player=action_player)
 
         if "folds" in line:
-             return actions.Fold(player=action_player)
-        
+            return actions.Fold(player=action_player)
+
         if match.group(7) is None:
-           raise ValueError(f"Couldn't parse actionWithAmount from: {action_string} considered as {action}")
+            raise ValueError(
+                f"Couldn't parse actionWithAmount from: {action_string} considered as {action}"
+            )
 
         amount = int(match.group(7).strip())
 
@@ -274,12 +277,9 @@ def parse_action(line):
 
         if "calls" in line:
             return actions.Call(player=action_player, amount=amount)
-        
+
         if "collected" in line:
             return actions.Collect(player=action_player, amount=amount)
-
-  
-
 
     raise ValueError(f"Error parsing line {line} as {action}")
 
@@ -287,4 +287,3 @@ def parse_action(line):
 def is_action(line: str) -> bool:
     """Return True if the line can be parsed as an action."""
     return ACTION_REGEX.match(line) is not None
-

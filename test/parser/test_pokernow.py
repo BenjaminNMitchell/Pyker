@@ -173,13 +173,11 @@ class ParserTests(unittest.TestCase):
 
         self.assertEqual(actual_hand, expected_hand)
 
-
     def test_parse_straddle_action(self):
         line = '"""Benny @ jzQ-urBlJX"" posts a straddle of 20",2021-02-11T02:41:46.355Z,161301130635712'
         actual = parser.parse_action(line)
         expected = Post(player=Player(name="Benny", id_="jzQ-urBlJX"), amount=20)
         self.assertEqual(actual, expected)
-
 
     def test_parse_returned_bet(self):
         line = '"Uncalled bet of 66 returned to ""Oven @ hogtf8AO2o""",2021-02-11T02:41:46.355Z,161301130635712'
