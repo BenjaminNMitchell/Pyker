@@ -221,7 +221,7 @@ def parse_street(hand, i, term_keyword):
     return street.Street(actions), i
 
 
-ACTION_REGEX_STR = f'"{PLAYER_REGEX_STR} ({"|".join(ACTIONS)})( a (missed )?big blind of| a (missing )?small blind of| to| a straddle of)?( [1-9][0-9]*)?'
+ACTION_REGEX_STR = f'"{PLAYER_REGEX_STR} ({"|".join(ACTIONS)})( a (missed )?big blind of| a (missing )?small blind of| to| a straddle of)?( [0-9][0-9]*)?'
 ACTION_REGEX = re.compile(ACTION_REGEX_STR)
 
 UNCALLED_REGEX_STR = f"(Uncalled bet of)( [1-9][0-9]*)( returned to) {PLAYER_REGEX_STR}"
@@ -261,7 +261,7 @@ def parse_action(line):
 
         if match.group(7) is None:
             raise ValueError(
-                f"Couldn't parse actionWithAmount from: {action_string} considered as {action}"
+                f"Couldn't parse actionWithAmount from: {action_string} aas {action}"
             )
 
         amount = int(match.group(7).strip())
