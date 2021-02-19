@@ -189,4 +189,5 @@ class ParserTests(unittest.TestCase):
     def test_parse_shows_with_cards(self):
         line = '"""Gargs @ izsy1Zibpi"" shows a A♠, A♣.",2021-02-11T02:41:46.355Z,161301130635712'
         actual = parser.parse_action(line)
-        expected = Show(player=Player(name="Gargs", id_='izsy1zibpi'), cards=('A♠', 'A♣'))
+        expected = Show(player=Player(name="Gargs", id_='izsy1Zibpi'), cards=(Card.from_string('A♠'), Card.from_string('A♣')))
+        self.assertEqual(actual, expected)
