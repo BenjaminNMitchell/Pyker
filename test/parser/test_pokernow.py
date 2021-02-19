@@ -2,7 +2,7 @@
 
 import unittest
 
-from poker.model.actions import Bet, Call, Fold, Check, Post, Raise, Collect, Return
+from poker.model.actions import Bet, Call, Fold, Check, Post, Raise, Collect, Return, Show
 from poker.model.player import Player
 from poker.model.hand import Hand
 from poker.model.street import Street
@@ -164,6 +164,7 @@ class ParserTests(unittest.TestCase):
                     Call(player=Player(name="Max", id_="izsy1Zibpi"), amount=30),
                     Call(player=Player(name="rus", id_="PjBYO_8gbf"), amount=30),
                     Fold(player=Player(name="Eddy KGB", id_="_7OU6FzFZP")),
+                    Show(player=Player("Ben", id_="eSbnubU-KP"), cards=(Card.from_string('Q♠'), Card.from_string('3♠'))),
                     Collect(player=Player(name="Ben", id_="eSbnubU-KP"), amount=130),
                 ]
             ),
@@ -179,8 +180,13 @@ class ParserTests(unittest.TestCase):
         expected = Post(player=Player(name="Benny", id_="jzQ-urBlJX"), amount=20)
         self.assertEqual(actual, expected)
 
-    def test_parse_returned_bet(self):
+    def test_parse_return_action(self):
         line = '"Uncalled bet of 66 returned to ""Oven @ hogtf8AO2o""",2021-02-11T02:41:46.355Z,161301130635712'
         actual = parser.parse_action(line)
         expected = Return(player=Player(name="Oven", id_="hogtf8AO2o"), amount=66)
         self.assertEqual(actual, expected)
+
+    def test_parse_shows_with_cards(self):
+        line = '"""Gargs @ izsy1Zibpi"" shows a A♠, A♣.",2021-02-11T02:41:46.355Z,161301130635712'
+        actual = parser.parse_action(line)
+        expected = Show(player=Player(name="Gargs", id_='izsy1zibpi'), cards=('A♠', 'A♣'))

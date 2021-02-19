@@ -10,7 +10,7 @@ from poker.model import game
 from poker.model import player
 from poker.model import card
 
-ACTIONS = ["posts", "bets", "raises", "calls", "checks", "folds", "collected"]
+ACTIONS = ["posts", "bets", "raises", "calls", "checks", "folds", "collected", "shows"]
 FLOP_MARKER = "flop:"
 TURN_MARKER = "turn:"
 RIVER_MARKER = "river:"
@@ -221,12 +221,13 @@ def parse_street(hand, i, term_keyword):
     return street.Street(actions), i
 
 
-ACTION_REGEX_STR = f'"{PLAYER_REGEX_STR} ({"|".join(ACTIONS)})( a (missed )?big blind of| a (missing )?small blind of| to| a straddle of)?( [1-9][0-9]*)?'
+ACTION_REGEX_STR = f'"{PLAYER_REGEX_STR} ({"|".join(ACTIONS)})( a (missed )?big blind of| a (missing )?small blind of| to| a straddle of| a ({CARD_REGEX_STR}), ({CARD_REGEX_STR}).)?( [0-9]+)?'
 ACTION_REGEX = re.compile(ACTION_REGEX_STR)
 
-UNCALLED_REGEX_STR = f"(Uncalled bet of)( [1-9][0-9]*)( returned to) {PLAYER_REGEX_STR}"
+UNCALLED_REGEX_STR = f"(Uncalled bet of)( [0-9]+)( returned to) {PLAYER_REGEX_STR}"
 UNCALLED_REGEX = re.compile(UNCALLED_REGEX_STR)
 
+SHOW_REGEX_STR = f'"{PLAYER_REGEX_STR} '
 
 def parse_action(line):
     """Parse the supplied line as a player action"""
@@ -250,7 +251,7 @@ def parse_action(line):
 
     action = match.group(3)
 
-    if action in ("bets", "posts", "raises", "calls", "collected", "checks", "folds"):
+    if action in ("bets", "posts", "raises", "calls", "collected", "checks", "folds", "shows"):
         action_player = player.Player(name=match.group(1), id_=match.group(2))
 
         if "checks" in line:
@@ -259,12 +260,21 @@ def parse_action(line):
         if "folds" in line:
             return actions.Fold(player=action_player)
 
-        if match.group(7) is None:
+        if "shows" in line:
+            if (match.group(7) or match.group(8)) is None:
+                raise ValueError(
+                            f"Couldn't parse actionWithCards from: {action_string} considered as {action}")
+
+            cards = (card.Card.from_string(match.group(7)), card.Card.from_string(match.group(8)))
+            return actions.Show(player=action_player, cards=cards)
+
+
+        if match.group(9) is None:
             raise ValueError(
                 f"Couldn't parse actionWithAmount from: {action_string} considered as {action}"
             )
 
-        amount = int(match.group(7).strip())
+        amount = int(match.group(9).strip())
 
         if "posts" in line:
             return actions.Post(player=action_player, amount=amount)
