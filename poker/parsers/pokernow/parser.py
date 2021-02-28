@@ -69,7 +69,7 @@ def parse_hand(hand_lines):
     while "Player stacks" not in hand_lines[i]:
         i += 1
 
-    players = parse_players(hand_lines[i])
+    stacks, players = parse_players(hand_lines[i])
     i += 1
 
     our_cards = parse_our_cards(hand_lines[i])
@@ -84,6 +84,7 @@ def parse_hand(hand_lines):
     else:
         logging.debug("No flop found on line %s", i)
         return hand.Hand(
+            stacks=stacks,
             players=players,
             our_cards=our_cards,
             preflop=preflop,
@@ -103,6 +104,7 @@ def parse_hand(hand_lines):
     else:
         logging.debug("No turn found on line %s", i)
         return hand.Hand(
+            stacks=stacks,
             players=players,
             our_cards=our_cards,
             preflop=preflop,
@@ -122,6 +124,7 @@ def parse_hand(hand_lines):
     else:
         logging.debug("No river found on line %s", i)
         return hand.Hand(
+            stacks=stacks,
             players=players,
             our_cards=our_cards,
             preflop=preflop,
@@ -135,6 +138,7 @@ def parse_hand(hand_lines):
 
     third, i = parse_street(hand_lines, i, "-- ending hand")
     return hand.Hand(
+        stacks=stacks,
         players=players,
         our_cards=our_cards,
         preflop=preflop,
@@ -180,7 +184,6 @@ PLAYER_STACK_REGEX = re.compile(
     f"#([1-9][0-9]*) {PLAYER_REGEX_STR} \\(([1-9][0-9]*)\\)"
 )
 
-
 def parse_players(line):
     """Parse the players from a hand."""
 
@@ -190,14 +193,19 @@ def parse_players(line):
     players = [player.strip() for player in players]
 
     player_objs = []
+    stacks = []
+
     for player_string in players:
         match = PLAYER_STACK_REGEX.search(player_string)
         if match is None:
             raise ValueError(f"Error parsing player string: {player_string}")
 
-        player_objs.append(player.Player(name=match.group(2), id_=match.group(3)))
+        player_obj = player.Player(name=match.group(2), id_=match.group(3))
 
-    return set(player_objs)
+        player_objs.append(player_obj)
+        stacks.append((player_obj, match.group(4)))
+
+    return set(player_objs), set(stacks)
 
 
 def parse_street(hand, i, term_keyword):
