@@ -12,35 +12,52 @@ log_file_path = "/mnt/c/Users/Owen Mitchell/Desktop/Files/Poker/Game Logs/poker_
 game_data = open(log_file_path).read()
 game = parse_game(game_data)
 
-d = {}
+chips_hand_by_player = {}
+chips_all_players = {}
+chips_all_players["hand"] = []
 
 for hand in game.hands:
-    away_players = list(d.keys())
+    chips_all_players["hand"].append(hand.id)
+    away_players = list(chips_hand_by_player.keys())
     for (player, stack) in hand.stacks:
-        if player.name not in d:
-            d[player.name] = []
+        if player.name not in chips_hand_by_player:
+            chips_hand_by_player[player.name] = []
         else:
             away_players.remove(player.name)
-        d[player.name].append((stack, hand.id))
+        chips_hand_by_player[player.name].append((stack, hand.id))
 
-plist = list(d.keys())
-
+plist = list(chips_hand_by_player.keys())
 options = []
+data_by_player = {}
+data = []
+
 for player in plist:
+
+    chips = []
+    hands = []
+    for (c, h) in chips_hand_by_player[player]:
+        chips.append(c)
+        hands.append(h)
+
+    player_data = {
+        "y": chips,
+        "x": hands,
+        "name": player,
+        "type": "line",
+    }
+
+    data_by_player[player] = player_data
+    data.append(player_data)
     options.append({"label": player, "value": player})
 
-df = pd.DataFrame(
-    {
-        "chips": [],
-        "hand": [],
-    }
-)
-figure = px.line(df, x="hand", y="chips")
 
+options.append({"label": "all", "value": "all"})
+
+figure = {"data": data, "layout": {"title": "Chips by Hand"}}
 app = dash.Dash("Pyker")
 app.layout = html.Div(
     [
-        dcc.Dropdown(id="player", options=options),
+        dcc.Dropdown(id="player", options=options, value="all"),
         dcc.Graph(id="my-graph", figure=figure),
     ],
     style={"width": "500"},
@@ -49,22 +66,14 @@ app.layout = html.Div(
 
 @app.callback(Output("my-graph", "figure"), [Input("player", "value")])
 def update_graph(player):
-    chips, hands = [], []
-    for (chip, hand_id) in d[player]:
-        print(chip, hand_id)
-        chips.append(chip)
-        hands.append(hand_id)
+    print(player)
+    if player == "all":
+        d = data
 
-    df = pd.DataFrame(
-        {
-            "chips": chips,
-            "hand": hands,
-            "player": player,
-        }
-    )
-
-    figure = px.line(df, x="hand", y="chips", title=player)
-    figure.data[0].update(mode="markers+lines")
+    else:
+        d = [data_by_player[player]]
+        print(d)
+    figure = {"data": d, "layout": {"title": "Chips by Hand"}}
     return figure
 
 
