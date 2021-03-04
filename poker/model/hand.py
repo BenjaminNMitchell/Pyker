@@ -1,17 +1,21 @@
 """This module defines a hand of texas holdem."""
 
-from typing import Tuple, Set
+from typing import List, Tuple, Set
 from dataclasses import dataclass
+
+from pandas.core.indexes.interval import interval_range
 
 from poker.model import street
 from poker.model import card
 from poker.model import player
 
+
 @dataclass
 class Hand:
     """A hand of texas holdem."""
 
-    stacks: Set[(player.Player, int)]
+    id: int
+    stacks: List[Tuple[player.Player, int]]
     players: Set[player.Player]
     our_cards: Tuple[card.Card]
     preflop: street.Street
@@ -21,6 +25,8 @@ class Hand:
     second: street.Street
     river: Tuple[card.Card]
     third: street.Street
+    # TODO implement showdowns in the parser?
+    # #showdown: Set[Tuple[card.Card]]
 
     def __str__(self):
         player_string = ", ".join([str(player) for player in self.players])

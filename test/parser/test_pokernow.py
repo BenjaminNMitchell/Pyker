@@ -2,7 +2,17 @@
 
 import unittest
 
-from poker.model.actions import Bet, Call, Fold, Check, Post, Raise, Collect, Return, Show
+from poker.model.actions import (
+    Bet,
+    Call,
+    Fold,
+    Check,
+    Post,
+    Raise,
+    Collect,
+    Return,
+    Show,
+)
 from poker.model.player import Player
 from poker.model.hand import Hand
 from poker.model.street import Street
@@ -36,8 +46,31 @@ class ParserTests(unittest.TestCase):
             Player(id_="izsy1Zibpi", name="Gargs"),
         }
 
-        actual = parser.parse_players(test_player_lines)
+        actual, _ = parser.parse_players(test_player_lines)
         self.assertEqual(actual, expected)
+
+    def test_get_stacks(self):
+        """Tests that player names are parsed along with their hand starting stacks"""
+
+        test_player_lines = (
+            '"Player stacks: '
+            '#1 ""Ert @ 9z1zzoqiIt"" (2000) | '
+            '#3 ""Suk @ TfZNpyIPhD"" (2000) | '
+            '#4 ""Russ @ PjBYO_8gbf"" (2000) | '
+            '#6 ""Chon @ bcp1N58-1M"" (2000) | '
+            '#8 ""Benny @ eSbnubU-KP"" (2000) | '
+            '#9 ""Gargs @ izsy1Zibpi"" (2000)"'
+            ",2021-01-09T18:13:11.491Z,161021599150607"
+        )
+
+        expected = {
+            (Player(id_="9z1zzoqiIt", name="Ert"), 2000),
+            (Player(id_="TfZNpyIPhD", name="Suk"), 2000),
+            (Player(id_="PjBYO_8gbf", name="Russ"), 2000),
+            (Player(id_="bcp1N58-1M", name="Chon"), 2000),
+            (Player(id_="eSbnubU-KP", name="Benny"), 2000),
+            (Player(id_="izsy1Zibpi", name="Gargs"), 2000),
+        }
 
     def test_get_actions(self):
         """Test that get_actions correctly parses actions."""
@@ -116,13 +149,21 @@ class ParserTests(unittest.TestCase):
         ]
 
         expected_hand = Hand(
+            id=6,
             players={
+                Player(name="Ben", id_="eSbnubU-KP"),
                 Player(name="Eddy KGB", id_="_7OU6FzFZP"),
                 Player(name="MOP", id_="jwf61y3XJg"),
-                Player(name="rus", id_="PjBYO_8gbf"),
-                Player(name="Ben", id_="eSbnubU-KP"),
                 Player(name="Max", id_="izsy1Zibpi"),
+                Player(name="rus", id_="PjBYO_8gbf"),
             },
+            stacks=[
+                (Player(name="MOP", id_="jwf61y3XJg"), 1060),
+                (Player(name="rus", id_="PjBYO_8gbf"), 971),
+                (Player(name="Eddy KGB", id_="_7OU6FzFZP"), 1025),
+                (Player(name="Ben", id_="eSbnubU-KP"), 1057),
+                (Player(name="Max", id_="izsy1Zibpi"), 887),
+            ],
             our_cards=(Card.from_string("Q♠"), Card.from_string("3♠")),
             preflop=Street(
                 actions=[
@@ -164,7 +205,10 @@ class ParserTests(unittest.TestCase):
                     Call(player=Player(name="Max", id_="izsy1Zibpi"), amount=30),
                     Call(player=Player(name="rus", id_="PjBYO_8gbf"), amount=30),
                     Fold(player=Player(name="Eddy KGB", id_="_7OU6FzFZP")),
-                    Show(player=Player("Ben", id_="eSbnubU-KP"), cards=(Card.from_string('Q♠'), Card.from_string('3♠'))),
+                    Show(
+                        player=Player("Ben", id_="eSbnubU-KP"),
+                        cards=(Card.from_string("Q♠"), Card.from_string("3♠")),
+                    ),
                     Collect(player=Player(name="Ben", id_="eSbnubU-KP"), amount=130),
                 ]
             ),
@@ -172,7 +216,15 @@ class ParserTests(unittest.TestCase):
 
         actual_hand = parser.parse_hand(hand_lines=hand_lines)
 
-        self.assertEqual(actual_hand, expected_hand)
+        self.assertCountEqual(actual_hand.players, expected_hand.players)
+        self.assertEqual(actual_hand.stacks, expected_hand.stacks)
+        self.assertEqual(actual_hand.preflop, expected_hand.preflop),
+        self.assertEqual(actual_hand.flop, expected_hand.flop),
+        self.assertEqual(actual_hand.first, expected_hand.first),
+        self.assertEqual(actual_hand.turn, expected_hand.turn),
+        self.assertEqual(actual_hand.second, expected_hand.second),
+        self.assertEqual(actual_hand.river, expected_hand.river),
+        self.assertEqual(actual_hand.third, expected_hand.third),
 
     def test_parse_straddle_action(self):
         line = '"""Benny @ jzQ-urBlJX"" posts a straddle of 20",2021-02-11T02:41:46.355Z,161301130635712'
@@ -189,5 +241,8 @@ class ParserTests(unittest.TestCase):
     def test_parse_shows_with_cards(self):
         line = '"""Gargs @ izsy1Zibpi"" shows a A♠, A♣.",2021-02-11T02:41:46.355Z,161301130635712'
         actual = parser.parse_action(line)
-        expected = Show(player=Player(name="Gargs", id_='izsy1Zibpi'), cards=(Card.from_string('A♠'), Card.from_string('A♣')))
+        expected = Show(
+            player=Player(name="Gargs", id_="izsy1Zibpi"),
+            cards=(Card.from_string("A♠"), Card.from_string("A♣")),
+        )
         self.assertEqual(actual, expected)

@@ -66,10 +66,13 @@ def parse_hand(hand_lines):
 
     # TODO filter out any lines that aren't part of the game `the player requested...` `the admin...`
     i = 0
+
+    id = parse_starting_hand(hand_lines[i])
+
     while "Player stacks" not in hand_lines[i]:
         i += 1
 
-    stacks, players = parse_players(hand_lines[i])
+    players, stacks = parse_players(hand_lines[i])
     i += 1
 
     our_cards = parse_our_cards(hand_lines[i])
@@ -84,6 +87,7 @@ def parse_hand(hand_lines):
     else:
         logging.debug("No flop found on line %s", i)
         return hand.Hand(
+            id=id,
             stacks=stacks,
             players=players,
             our_cards=our_cards,
@@ -104,6 +108,7 @@ def parse_hand(hand_lines):
     else:
         logging.debug("No turn found on line %s", i)
         return hand.Hand(
+            id=id,
             stacks=stacks,
             players=players,
             our_cards=our_cards,
@@ -124,6 +129,7 @@ def parse_hand(hand_lines):
     else:
         logging.debug("No river found on line %s", i)
         return hand.Hand(
+            id=id,
             stacks=stacks,
             players=players,
             our_cards=our_cards,
@@ -138,6 +144,7 @@ def parse_hand(hand_lines):
 
     third, i = parse_street(hand_lines, i, "-- ending hand")
     return hand.Hand(
+        id=id,
         stacks=stacks,
         players=players,
         our_cards=our_cards,
@@ -149,6 +156,20 @@ def parse_hand(hand_lines):
         river=river,
         third=third,
     )
+
+
+STARTING_REGEX_STR = f'"-- starting hand #([1-9][0-9]*)'
+STARTING_REGEX = re.compile(STARTING_REGEX_STR)
+
+
+def parse_starting_hand(line):
+    line, _, _ = line.rsplit(",")
+    match = STARTING_REGEX.match(line)
+
+    if match == None:
+        raise ValueError(f"Could not parse starting hand line from: {line}")
+
+    return int(match.group(1))
 
 
 CARD_REGEX_STR = r"[AKQJ1-9]{1}0?[♥♣♠♦]"
@@ -184,6 +205,7 @@ PLAYER_STACK_REGEX = re.compile(
     f"#([1-9][0-9]*) {PLAYER_REGEX_STR} \\(([1-9][0-9]*)\\)"
 )
 
+
 def parse_players(line):
     """Parse the players from a hand."""
 
@@ -203,9 +225,9 @@ def parse_players(line):
         player_obj = player.Player(name=match.group(2), id_=match.group(3))
 
         player_objs.append(player_obj)
-        stacks.append((player_obj, match.group(4)))
+        stacks.append((player_obj, int(match.group(4))))
 
-    return set(player_objs), set(stacks)
+    return set(player_objs), stacks
 
 
 def parse_street(hand, i, term_keyword):
@@ -237,6 +259,7 @@ UNCALLED_REGEX = re.compile(UNCALLED_REGEX_STR)
 
 SHOW_REGEX_STR = f'"{PLAYER_REGEX_STR} '
 
+
 def parse_action(line):
     """Parse the supplied line as a player action"""
 
@@ -259,7 +282,16 @@ def parse_action(line):
 
     action = match.group(3)
 
-    if action in ("bets", "posts", "raises", "calls", "collected", "checks", "folds", "shows"):
+    if action in (
+        "bets",
+        "posts",
+        "raises",
+        "calls",
+        "collected",
+        "checks",
+        "folds",
+        "shows",
+    ):
         action_player = player.Player(name=match.group(1), id_=match.group(2))
 
         if "checks" in line:
@@ -271,11 +303,14 @@ def parse_action(line):
         if "shows" in line:
             if (match.group(7) or match.group(8)) is None:
                 raise ValueError(
-                            f"Couldn't parse actionWithCards from: {action_string} considered as {action}")
+                    f"Couldn't parse actionWithCards from: {action_string} considered as {action}"
+                )
 
-            cards = (card.Card.from_string(match.group(7)), card.Card.from_string(match.group(8)))
+            cards = (
+                card.Card.from_string(match.group(7)),
+                card.Card.from_string(match.group(8)),
+            )
             return actions.Show(player=action_player, cards=cards)
-
 
         if match.group(9) is None:
             raise ValueError(
