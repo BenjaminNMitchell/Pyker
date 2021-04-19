@@ -29,7 +29,8 @@ class ParserTests(unittest.TestCase):
         test_player_lines = (
             '"Player stacks: '
             '#1 ""Ert @ 9z1zzoqiIt"" (2000) | '
-            '#3 ""Suk @ TfZNpyIPhD"" (2000) | '
+            '#2 ""`~!@#$%^& @ 9z1zzoqiIt"" (2000) | '
+            '#3 ""Paulie. D @ TfZNpyIPhD"" (2000) | '
             '#4 ""Russ @ PjBYO_8gbf"" (2000) | '
             '#6 ""Chon @ bcp1N58-1M"" (2000) | '
             '#8 ""Benny @ eSbnubU-KP"" (2000) | '
@@ -39,7 +40,8 @@ class ParserTests(unittest.TestCase):
 
         expected = {
             Player(id_="9z1zzoqiIt", name="Ert"),
-            Player(id_="TfZNpyIPhD", name="Suk"),
+            Player(id_="9z1zzoqiIt", name="`~!@#$%^&"),
+            Player(id_="TfZNpyIPhD", name="Paulie. D"),
             Player(id_="PjBYO_8gbf", name="Russ"),
             Player(id_="bcp1N58-1M", name="Chon"),
             Player(id_="eSbnubU-KP", name="Benny"),
