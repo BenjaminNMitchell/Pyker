@@ -24,7 +24,7 @@ class ParserTests(unittest.TestCase):
     """Tests for the poker now parser."""
 
     def test_get_players(self):
-        """Test that get_players correctly parses the players line."""
+        """Test that parse_players correctly parses the players lines."""
 
         test_player_lines = (
             '"Player stacks: '

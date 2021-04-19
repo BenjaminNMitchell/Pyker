@@ -19,4 +19,7 @@ class Street:
         return f"Street(actions={repr(self.actions)})"
 
     def __str__(self):
-        return "\n".join([str(action) for action in self.actions])
+        s = "Action Goes:\n"
+        for action in self.actions:
+            s += "\t" + str(action) + "\n"
+        return s

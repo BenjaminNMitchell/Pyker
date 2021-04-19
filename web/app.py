@@ -8,13 +8,19 @@ import plotly.express as px
 
 from poker.parsers.pokernow.parser import parse_game
 
-log_file_path = "/mnt/c/Users/Owen Mitchell/Desktop/Files/Poker/Game Logs/poker_now_log_hyrimfOUVowoGt_23GAl7gq65.csv"
+# You'll have to hardcode this in for now
+log_file_path = "/mnt/c/Users/Owen Mitchell/Desktop/Files/Poker/Game Logs/poker_now_log_d3SCENVxPZYrYHLhpKrxi_FBu.csv"
 game_data = open(log_file_path).read()
+
+# TODO Implement multiple games
 game = parse_game(game_data)
 
 chips_hand_by_player = {}
 chips_all_players = {}
 chips_all_players["hand"] = []
+
+
+# test
 
 for hand in game.hands:
     chips_all_players["hand"].append(hand.id)

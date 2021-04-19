@@ -86,15 +86,18 @@ class Return(ActionWithAmount):  # pylint: disable=too-few-public-methods
 
 @dataclass
 class ActionWithCards:
+    """
+    a generic action that associates player with cards.
+    """
 
     player: Player
     cards: Tuple[Card]
 
-    # TODO str() and repr()
+    def __str__(self):
 
-    """
-    a generic action that associates player with cards.
-    """
+        (first, second) = self.cards
+
+        return f"{self.player} shows ({str(first)},{str(second)})"
 
 
 class Show(ActionWithCards):

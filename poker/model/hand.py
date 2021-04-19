@@ -35,10 +35,10 @@ class Hand:
             f"Players: {player_string}\n\n"
             f"Our Cards: {self.our_cards}\n"
             f"Pre Flop\n{self.preflop}\n\n"
-            f"Flop: {self.flop}\n"
+            f"Flop: {str(self.flop)}\n"
             f"First Street\n{self.first}\n\n"
-            f"Turn: {self.turn}\n"
+            f"Turn: {str(self.turn)}\n"
             f"Second Street\n{self.second}\n\n"
-            f"River: {self.river}\n"
+            f"River: {str(self.river)}\n"
             f"Third Street\n{self.third}\n"
         )
