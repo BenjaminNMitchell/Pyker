@@ -15,6 +15,31 @@ FLOP_MARKER = "flop:"
 TURN_MARKER = "turn:"
 RIVER_MARKER = "river:"
 
+STARTING_REGEX_STR = f'"-- starting hand #([1-9][0-9]*)'
+STARTING_REGEX = re.compile(STARTING_REGEX_STR)
+
+CARD_REGEX_STR = r"[AKQJ1-9]{1}0?[♥♣♠♦]"
+CARD_REGEX = re.compile(CARD_REGEX_STR)
+
+HAND_REGEX_STR = f'"Your hand is ({CARD_REGEX_STR}), ({CARD_REGEX_STR})".*'
+HAND_REGEX = re.compile(HAND_REGEX_STR)
+
+PLAYER_REGEX_STR = r'''""([-_a-zA-Z0-9' ]+?) @ ([-_0-9a-zA-Z_]{10})""'''
+PLAYER_REGEX = re.compile(PLAYER_REGEX_STR)
+
+PLAYER_STACK_REGEX = re.compile(
+    f"#([1-9][0-9]*) {PLAYER_REGEX_STR} \\(([1-9][0-9]*)\\)"
+)
+
+
+ACTION_REGEX_STR = f'"{PLAYER_REGEX_STR} ({"|".join(ACTIONS)})( a (missed )?big blind of| a (missing )?small blind of| to| a straddle of| a ({CARD_REGEX_STR}), ({CARD_REGEX_STR}).)?( [0-9]+)?'
+ACTION_REGEX = re.compile(ACTION_REGEX_STR)
+
+UNCALLED_REGEX_STR = f"(Uncalled bet of)( [0-9]+)( returned to) {PLAYER_REGEX_STR}"
+UNCALLED_REGEX = re.compile(UNCALLED_REGEX_STR)
+
+SHOW_REGEX_STR = f'"{PLAYER_REGEX_STR} '
+
 
 def parse_game(game_data):
     """Parse a list of lines into a Game object."""
@@ -158,10 +183,6 @@ def parse_hand(hand_lines):
     )
 
 
-STARTING_REGEX_STR = f'"-- starting hand #([1-9][0-9]*)'
-STARTING_REGEX = re.compile(STARTING_REGEX_STR)
-
-
 def parse_starting_hand(line):
     line, _, _ = line.rsplit(",")
     match = STARTING_REGEX.match(line)
@@ -170,13 +191,6 @@ def parse_starting_hand(line):
         raise ValueError(f"Could not parse starting hand line from: {line}")
 
     return int(match.group(1))
-
-
-CARD_REGEX_STR = r"[AKQJ1-9]{1}0?[♥♣♠♦]"
-CARD_REGEX = re.compile(CARD_REGEX_STR)
-
-HAND_REGEX_STR = f'"Your hand is ({CARD_REGEX_STR}), ({CARD_REGEX_STR})".*'
-HAND_REGEX = re.compile(HAND_REGEX_STR)
 
 
 def parse_our_cards(line):
@@ -196,14 +210,6 @@ def parse_cards(line):
 
     cards = line[line.find("[") + 1 : line.rfind("]")]
     return [card.Card.from_string(c.strip()) for c in cards.split(",")]
-
-
-PLAYER_REGEX_STR = r'''""([-_a-zA-Z0-9' ]+?) @ ([-_0-9a-zA-Z_]{10})""'''
-PLAYER_REGEX = re.compile(PLAYER_REGEX_STR)
-
-PLAYER_STACK_REGEX = re.compile(
-    f"#([1-9][0-9]*) {PLAYER_REGEX_STR} \\(([1-9][0-9]*)\\)"
-)
 
 
 def parse_players(line):
@@ -249,15 +255,6 @@ def parse_street(hand, i, term_keyword):
         i += 1
 
     return street.Street(actions), i
-
-
-ACTION_REGEX_STR = f'"{PLAYER_REGEX_STR} ({"|".join(ACTIONS)})( a (missed )?big blind of| a (missing )?small blind of| to| a straddle of| a ({CARD_REGEX_STR}), ({CARD_REGEX_STR}).)?( [0-9]+)?'
-ACTION_REGEX = re.compile(ACTION_REGEX_STR)
-
-UNCALLED_REGEX_STR = f"(Uncalled bet of)( [0-9]+)( returned to) {PLAYER_REGEX_STR}"
-UNCALLED_REGEX = re.compile(UNCALLED_REGEX_STR)
-
-SHOW_REGEX_STR = f'"{PLAYER_REGEX_STR} '
 
 
 def parse_action(line):
