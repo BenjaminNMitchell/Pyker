@@ -24,7 +24,7 @@ CARD_REGEX = re.compile(CARD_REGEX_STR)
 HAND_REGEX_STR = f'"Your hand is ({CARD_REGEX_STR}), ({CARD_REGEX_STR})".*'
 HAND_REGEX = re.compile(HAND_REGEX_STR)
 
-PLAYER_REGEX_STR = r'''""([-_a-zA-Z0-9' ]+?) @ ([-_0-9a-zA-Z_]{10})""'''
+PLAYER_REGEX_STR = r'''""(.+?) @ ([-_0-9a-zA-Z_]{10})""'''
 PLAYER_REGEX = re.compile(PLAYER_REGEX_STR)
 
 PLAYER_STACK_REGEX = re.compile(
