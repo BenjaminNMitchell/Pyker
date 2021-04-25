@@ -14,4 +14,4 @@ class Game:
         self.hands = hands
         self.players: Set[Player] = set()
         for hand in hands:
-            self.players.union(hand.players)
+            self.players = self.players.union(hand.players)
