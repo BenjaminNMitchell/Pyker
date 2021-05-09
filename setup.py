@@ -1,11 +1,10 @@
-from distutils.core import setup
+import setuptools
 
-setup(
-    name="Pyker",
-    version="0.1dev",
-    packages=[
-        "poker",
-    ],
+setuptools.setup(
+    name="pyker",
+    version="0.0.1",
+    packages=setuptools.find_packages(),
     license="",
     long_description=open("README.md").read(),
+    url="https://github.com/BenjaminNMitchell/Pyker",
 )
