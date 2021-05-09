@@ -8,7 +8,7 @@ setuptools.setup(
     author="Benjamin Mitchell",
     author_email="benjamin.neil.mitchell@gmail.com",
     version="0.0.1",
-    packages=setuptools.find_packages(where="poker"),
+    packages=setuptools.find_packages(),
     long_description=long_description,
     long_description_content_type="text/markdown",
     url="https://github.com/BenjaminNMitchell/Pyker",
