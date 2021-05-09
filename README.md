@@ -7,6 +7,13 @@ Pyker is made to help players to extract statistics and insights from poker game
 ## Supported Formats
 - [Pokernow](https://www.pokernow.club/)
 
+## Usage
+
+### Install the library
+```bash
+pip install "git+https://github.com/BenjaminNMitchell/Pyker#egg=pyker"
+```
+
 ## Dev
 
 ### Setup
