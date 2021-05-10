@@ -13,16 +13,19 @@ class Suits(enum.Enum):
     CLUBS = 3
     DIAMONDS = 4
 
+    def __str__(self):
+        return SUIT_TO_STRING_MAPPING[self]
+
 
 STRING_TO_SUIT_MAPPING = {
-    "S": Suits.SPADES,
     "♠": Suits.SPADES,
-    "C": Suits.CLUBS,
+    "S": Suits.SPADES,
     "♣": Suits.CLUBS,
-    "H": Suits.HEARTS,
+    "C": Suits.CLUBS,
     "♥": Suits.HEARTS,
-    "D": Suits.DIAMONDS,
+    "H": Suits.HEARTS,
     "♦": Suits.DIAMONDS,
+    "D": Suits.DIAMONDS,
 }
 SUIT_TO_STRING_MAPPING = {v: k for k, v in STRING_TO_SUIT_MAPPING.items()}
 
@@ -47,6 +50,9 @@ class Values(enum.Enum):
     def __lt__(self, other):
         if self.__class__ is other.__class__:
             return self.value < other.value
+
+    def __str__(self):
+        return VALUE_TO_STRING_MAPPING[self]
 
 
 STRING_TO_VALUE_MAPPING = {
@@ -103,6 +109,9 @@ class Card:
         return (
             f"{VALUE_TO_STRING_MAPPING[self.value]}{SUIT_TO_STRING_MAPPING[self.suit]}"
         )
+
+    def __repr__(self):
+        return str(self)
 
     def __lt__(self, other):
         if not isinstance(other, Card):
