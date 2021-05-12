@@ -221,7 +221,7 @@ def parse_players(line):
     players = [player.strip() for player in players]
 
     player_objs = []
-    stacks = []
+    stacks = {}
 
     for player_string in players:
         match = PLAYER_STACK_REGEX.search(player_string)
@@ -231,7 +231,7 @@ def parse_players(line):
         player_obj = player.Player(name=match.group(2), id_=match.group(3))
 
         player_objs.append(player_obj)
-        stacks.append((player_obj, int(match.group(4))))
+        stacks[player_obj] = int(match.group(4))
 
     return set(player_objs), stacks
 
