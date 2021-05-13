@@ -1,4 +1,3 @@
-from poker.encoders.json.actions import ActionEncoder
 import unittest
 
 from poker.model import card, player, actions, street
@@ -48,7 +47,7 @@ class EncoderTests_JSON(unittest.TestCase):
         self.assertEqual(expected_check, ActionEncoder().default(check))
         self.assertEqual(expected_fold, ActionEncoder().default(fold))
 
-    def test_serialize_bet(self):
+    def test_serialize_with_amount(self):
 
         p = player.Player(name="Oven", id_="jwf61y3XJg")
         v = 100
@@ -102,3 +101,17 @@ class EncoderTests_JSON(unittest.TestCase):
         self.assertDictEqual(expected_post, awa_encoder.default(post))
         self.assertDictEqual(expected_collect, awa_encoder.default(collect))
         self.assertDictEqual(expected_return, awa_encoder.default(return_))
+
+    def test_seralize_actions_with_cards(self):
+
+        p = player.Player(name="Oven", id_="jwf61y3XJg")
+        c = [card.Card(value="A", suit="D"), card.Card(value="A", suit="C")]
+
+        model = actions.Show(player=p, cards=c)
+        expected = {
+            "type": "show",
+            "player": {"name": "Oven", "id_": "jwf61y3XJg"},
+            "cards": [{"suit": "D", "value": "A"}, {"suit": "C", "value": "A"}],
+        }
+
+        self.assertDictEqual(expected, ActionWithCardsEncoder().default(model))

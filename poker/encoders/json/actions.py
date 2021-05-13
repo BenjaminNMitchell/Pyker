@@ -30,9 +30,11 @@ class ActionWithCardsEncoder:
     def default(self, object):
         if isinstance(object, ActionWithCards):
             c_encoder = CardEncoder()
+            p_encoder = PlayerEncoder()
 
             return {
                 "type": object.__class__.__name__.lower(),
+                "player": p_encoder.default(object.player),
                 "cards": [c_encoder.default(x) for x in object.cards],
             }
         return JSONEncoder.default(self, object)
