@@ -21,14 +21,14 @@ class StreetEncoder(JSONEncoder):
 
             for action in object.actions:
 
-                if object.__class__ == Action:
-                    json_repr = a_encoder.default(object)
+                if isinstance(action, Action):
+                    json_repr = a_encoder.default(action)
 
-                if object.__class__ == ActionWithAmount:
-                    json_repr = awa_encoder.default(object)
+                if isinstance(action, ActionWithAmount):
+                    json_repr = awa_encoder.default(action)
 
-                if object.__class__ == ActionWithCards:
-                    json_repr = awa_encoder.default(object)
+                if isinstance(action, ActionWithCards):
+                    json_repr = awc_encoder.default(action)
 
                 serialized.append(json_repr)
         return {"actions": serialized}

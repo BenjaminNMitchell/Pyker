@@ -1,3 +1,4 @@
+from poker.encoders.json.street import StreetEncoder
 import unittest
 
 from poker.model import card, player, actions, street
@@ -14,6 +15,8 @@ from poker.encoders.json.card import CardEncoder
 
 class EncoderTests_JSON(unittest.TestCase):
     """Test JSON endcoder classes"""
+
+
 
     def test_serialize_card(self):
 
@@ -115,3 +118,23 @@ class EncoderTests_JSON(unittest.TestCase):
         }
 
         self.assertDictEqual(expected, ActionWithCardsEncoder().default(model))
+
+    def test_seralize_street(self):
+
+        self.maxDiff = None
+
+        model = street.Street(actions=
+        [
+            actions.Fold(player=player.Player(name="Rus", id_="PjBYO_8gbf")),
+            actions.Collect(player=player.Player(name="Benny", id_="eSbnubU"), amount=10),
+            actions.Show(player=player.Player(name="Rus", id_="PjBYO_8gbf"), cards=[card.Card(value="A", suit="D"), card.Card(value="A", suit="C")]),
+        ])
+
+        expected = {'actions': [
+            {'type': 'fold', "player": {"name": "Rus", "id_": "PjBYO_8gbf"}},
+            {'type': 'collect', 'player': {"name": "Benny", "id_": "eSbnubU"}, 'amount': '10'},
+            {'type': 'show', "player": {"name": "Rus", "id_": "PjBYO_8gbf"}, 
+            "cards": [{"suit": "D", "value": "A"}, {"suit": "C", "value": "A"}]},
+        ]}
+
+        self.assertDictEqual(expected, StreetEncoder().default(model))
