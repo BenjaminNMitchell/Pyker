@@ -1,7 +1,7 @@
 from poker.encoders.json.street import StreetEncoder
 import unittest
 
-from poker.model import card, player, actions, street
+from poker.model import card, player, actions, street, hand, game
 from poker.encoders.json.card import CardEncoder
 from poker.encoders.json.player import PlayerEncoder
 from poker.encoders.json.actions import (
@@ -9,21 +9,18 @@ from poker.encoders.json.actions import (
     ActionWithAmountEncoder,
     ActionWithCardsEncoder,
 )
-from poker.encoders.json.card import CardEncoder
-from poker.encoders.json.card import CardEncoder
+from poker.encoders.json.hand import HandEncoder
 
 
 class EncoderTests_JSON(unittest.TestCase):
     """Test JSON endcoder classes"""
 
-
-
+    def setUp(self):
+       self.card_model_QD = card.Card(value=card.Values.QUEEN, suit=card.Suits.DIAMONDS)
+       self.card_json_QD = {"suit": "D", "value": "Q"}
     def test_serialize_card(self):
 
-        model = card.Card(value=card.Values.QUEEN, suit=card.Suits.DIAMONDS)
-        expected = {"suit": "D", "value": "Q"}
-
-        self.assertEqual(expected, CardEncoder().default(model))
+        self.assertEqual(self.card_json_QD, CardEncoder().default(self.card_model_QD))
 
     def test_serialize_player(self):
 
@@ -123,18 +120,92 @@ class EncoderTests_JSON(unittest.TestCase):
 
         self.maxDiff = None
 
-        model = street.Street(actions=
-        [
-            actions.Fold(player=player.Player(name="Rus", id_="PjBYO_8gbf")),
-            actions.Collect(player=player.Player(name="Benny", id_="eSbnubU"), amount=10),
-            actions.Show(player=player.Player(name="Rus", id_="PjBYO_8gbf"), cards=[card.Card(value="A", suit="D"), card.Card(value="A", suit="C")]),
-        ])
+        model = street.Street(
+            actions=[
+                actions.Fold(player=player.Player(name="Rus", id_="PjBYO_8gbf")),
+                actions.Collect(
+                    player=player.Player(name="Benny", id_="eSbnubU"), amount=10
+                ),
+                actions.Show(
+                    player=player.Player(name="Rus", id_="PjBYO_8gbf"),
+                    cards=[
+                        card.Card(value="A", suit="D"),
+                        card.Card(value="A", suit="C"),
+                    ],
+                ),
+            ]
+        )
 
-        expected = {'actions': [
-            {'type': 'fold', "player": {"name": "Rus", "id_": "PjBYO_8gbf"}},
-            {'type': 'collect', 'player': {"name": "Benny", "id_": "eSbnubU"}, 'amount': '10'},
-            {'type': 'show', "player": {"name": "Rus", "id_": "PjBYO_8gbf"}, 
-            "cards": [{"suit": "D", "value": "A"}, {"suit": "C", "value": "A"}]},
-        ]}
+        expected = {
+            "actions": [
+                {"type": "fold", "player": {"name": "Rus", "id_": "PjBYO_8gbf"}},
+                {
+                    "type": "collect",
+                    "player": {"name": "Benny", "id_": "eSbnubU"},
+                    "amount": "10",
+                },
+                {
+                    "type": "show",
+                    "player": {"name": "Rus", "id_": "PjBYO_8gbf"},
+                    "cards": [{"suit": "D", "value": "A"}, {"suit": "C", "value": "A"}],
+                },
+            ]
+        }
 
         self.assertDictEqual(expected, StreetEncoder().default(model))
+
+    def test_serialize_short_hand(self):
+
+        self.maxDiff = None
+
+        model = hand.Hand(
+            id=1,
+            stacks = {player.Player(name="Rus", id_="PjBYO_8gbf"): 1000,
+                      player.Player(name="Benny", id_="eSbnubU"): 1000},
+            players =[
+                player.Player(name="Rus", id_="PjBYO_8gbf"),
+                player.Player(name="Benny", id_="eSbnubU")],
+            our_cards = [card.Card(value="A", suit="D"),
+                        card.Card(value="A", suit="C")],
+            preflop=  street.Street(actions=[
+                actions.Fold(player=player.Player(name="Rus", id_="PjBYO_8gbf")),
+                actions.Collect(
+                    player=player.Player(name="Benny", id_="eSbnubU"), amount=10),
+                actions.Show(
+                    player=player.Player(name="Rus", id_="PjBYO_8gbf"),
+                    cards=[
+                        card.Card(value="A", suit="D"),
+                        card.Card(value="A", suit="C")],
+                ),
+            ]), 
+
+            flop= [
+                card.Card(value="K", suit="D"),
+                card.Card(value="K", suit="C"),
+                card.Card(value="K", suit='S')]
+        ) 
+
+        expected = {
+            'id': '1',
+            'players': [{"name": "Rus", "id_": "PjBYO_8gbf"},
+                        {"name": "Benny", "id_": "eSbnubU"}],
+            'our_cards': [{"suit": "D", "value": "A"}, {"suit": "C", "value": "A"}],
+            'preflop': {'actions': [
+                {"type": "fold", "player": {"name": "Rus", "id_": "PjBYO_8gbf"}},
+                {
+                    "type": "collect",
+                    "player": {"name": "Benny", "id_": "eSbnubU"},
+                    "amount": "10",
+                },
+                {
+                    "type": "show",
+                    "player": {"name": "Rus", "id_": "PjBYO_8gbf"},
+                    "cards": [{"suit": "D", "value": "A"}, {"suit": "C", "value": "A"}],
+                },]},
+            'flop': [{'value': 'K', 'suit': 'D'},
+            {'value': 'K', 'suit': 'C'},
+            {'value': 'K', 'suit': 'S'}]
+        }
+
+        self.assertDictEqual(expected, HandEncoder().default(model))
+        

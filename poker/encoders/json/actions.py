@@ -6,6 +6,9 @@ from poker.model.actions import Action, ActionWithAmount, ActionWithCards
 
 
 class ActionEncoder(JSONEncoder):
+    """Serializer for action objects""" 
+
+
     def default(self, object):
         if isinstance(object, Action):
             return {
@@ -15,7 +18,9 @@ class ActionEncoder(JSONEncoder):
         return JSONEncoder.default(self, object)
 
 
-class ActionWithAmountEncoder:
+class ActionWithAmountEncoder(JSONEncoder):
+    """Serializer for ActionWithAmount objects"""
+
     def default(self, object):
         if isinstance(object, ActionWithAmount):
             return {
@@ -26,7 +31,8 @@ class ActionWithAmountEncoder:
         return JSONEncoder.default(self, object)
 
 
-class ActionWithCardsEncoder:
+class ActionWithCardsEncoder(JSONEncoder):
+    """Serializer for ActionWithCards objects"""
     def default(self, object):
         if isinstance(object, ActionWithCards):
             c_encoder = CardEncoder()
