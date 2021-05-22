@@ -155,7 +155,7 @@ class ParserTests(unittest.TestCase):
         ]
 
         expected_hand = Hand(
-            id=6,
+            id_=6,
             players={
                 Player(name="Ben", id_="eSbnubU-KP"),
                 Player(name="Eddy KGB", id_="_7OU6FzFZP"),

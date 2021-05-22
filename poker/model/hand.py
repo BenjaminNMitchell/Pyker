@@ -12,7 +12,7 @@ from poker.model import player
 class Hand:
     """A hand of texas holdem."""
 
-    id: int
+    id_: int
     stacks: Dict[player.Player, int]
     players: Set[player.Player]
     our_cards: Tuple[card.Card]

@@ -1,3 +1,4 @@
+"""Json Encoders for Action, ActionWithAmount, ActionWithCards objects"""
 from json import JSONEncoder
 
 from poker.encoders.json.card import CardEncoder
@@ -6,8 +7,7 @@ from poker.model.actions import Action, ActionWithAmount, ActionWithCards
 
 
 class ActionEncoder(JSONEncoder):
-    """Serializer for action objects""" 
-
+    """Serializer for action objects"""
 
     def default(self, object):
         if isinstance(object, Action):
@@ -33,6 +33,7 @@ class ActionWithAmountEncoder(JSONEncoder):
 
 class ActionWithCardsEncoder(JSONEncoder):
     """Serializer for ActionWithCards objects"""
+
     def default(self, object):
         if isinstance(object, ActionWithCards):
             c_encoder = CardEncoder()

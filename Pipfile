@@ -9,6 +9,8 @@ pylint = "*"
 coverage = "*"
 mypy = "*"
 data-science-types = "*"
+pytest = "*"
+werkzeug.http = "0.16.1"
 
 [packages]
 pandas = "*"
