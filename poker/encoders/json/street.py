@@ -10,10 +10,10 @@ from poker.encoders.json.actions import (
 )
 
 
-class StreetEncoder(JSONEncoder):
+class StreetEncoder:
     """Extends JSONEncoder for Street object"""
 
-    def default(self, object):
+    def encode(self, object):
         """Street -> JSON"""
         if isinstance(object, Street):
 
@@ -26,13 +26,13 @@ class StreetEncoder(JSONEncoder):
             for action in object.actions:
 
                 if isinstance(action, Action):
-                    json_repr = a_encoder.default(action)
+                    json_repr = a_encoder.encode(action)
 
                 if isinstance(action, ActionWithAmount):
-                    json_repr = awa_encoder.default(action)
+                    json_repr = awa_encoder.encode(action)
 
                 if isinstance(action, ActionWithCards):
-                    json_repr = awc_encoder.default(action)
+                    json_repr = awc_encoder.encode(action)
 
                 serialized.append(json_repr)
 

@@ -3,13 +3,14 @@
 from json import JSONEncoder
 
 from poker.model.card import Card
+from poker.encoders.json.exceptions import UnsupportedObjectToJSON
 
 
-class CardEncoder(JSONEncoder):
+class CardEncoder:
     """Card object to JSON"""
 
-    def default(self, object):
+    def encode(self, object):
         if isinstance(object, Card):
             return {"suit": str(object.suit), "value": str(object.value)}
 
-        return JSONEncoder.default(self, object)
+        raise UnsupportedObjectToJSON(f"CardEncoder called on {type(object)}")

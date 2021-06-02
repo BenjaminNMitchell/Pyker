@@ -7,7 +7,7 @@ from poker.model.player import Player
 class PlayerEncoder(JSONEncoder):
     """Encoder class for Player object"""
 
-    def default(self, object):
+    def encode(self, object):
         """Player to JSON"""
         if isinstance(object, Player):
             return {"name": object.name, "id_": str(object.id_)}
