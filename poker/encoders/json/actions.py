@@ -1,5 +1,4 @@
-"""Json Encoders for Action, ActionWithAmount, ActionWithCards objects"""
-from json import JSONEncoder
+"""Json Encoders for Action, ActionWithAmount, ActionWithCards objs"""
 
 from poker.encoders.json.exceptions import UnsupportedObjectToJSON
 from poker.encoders.json.card import CardEncoder
@@ -10,42 +9,43 @@ from poker.model.actions import Action, ActionWithAmount, ActionWithCards
 class ActionEncoder:
     """Serializer for action objects"""
 
-    def encode(self, object):
-        if isinstance(object, Action):
+    def encode(self, obj):
+        """Action -> JSON"""
+        if isinstance(obj, Action):
             return {
-                "type": object.__class__.__name__.lower(),
-                "player": PlayerEncoder().encode(object.player),
+                "type": obj.__class__.__name__.lower(),
+                "player": PlayerEncoder().encode(obj.player),
             }
-        raise UnsupportedObjectToJSON(f"ActionEncoder called on {type(object)}")
+        raise UnsupportedObjectToJSON(f"ActionEncoder called on {type(obj)}")
 
 
 class ActionWithAmountEncoder:
     """Serializer for ActionWithAmount objects"""
 
-    def encode(self, object):
-        if isinstance(object, ActionWithAmount):
+    def encode(self, obj):
+        """ActionWithAmount -> JSON"""
+        if isinstance(obj, ActionWithAmount):
             return {
-                "type": object.__class__.__name__.lower(),
-                "player": PlayerEncoder().encode(object.player),
-                "amount": str(object.amount),
+                "type": obj.__class__.__name__.lower(),
+                "player": PlayerEncoder().encode(obj.player),
+                "amount": str(obj.amount),
             }
 
-        raise UnsupportedObjectToJSON(
-            f"ActionWithAmountEncoder called on {type(object)}"
-        )
+        raise UnsupportedObjectToJSON(f"ActionWithAmountEncoder called on {type(obj)}")
 
 
 class ActionWithCardsEncoder:
     """Serializer for ActionWithCards objects"""
 
-    def encode(self, object):
-        if isinstance(object, ActionWithCards):
+    def encode(self, obj):
+        """ActionWithCards -> JSON"""
+        if isinstance(obj, ActionWithCards):
             c_encoder = CardEncoder()
             p_encoder = PlayerEncoder()
 
             return {
-                "type": object.__class__.__name__.lower(),
-                "player": p_encoder.encode(object.player),
-                "cards": [c_encoder.encode(x) for x in object.cards],
+                "type": obj.__class__.__name__.lower(),
+                "player": p_encoder.encode(obj.player),
+                "cards": [c_encoder.encode(x) for x in obj.cards],
             }
-        raise UnsupportedObjectToJSON(f"ActionWithCardEncoder called on {type(object)}")
+        raise UnsupportedObjectToJSON(f"ActionWithCardEncoder called on {type(obj)}")

@@ -187,7 +187,7 @@ def parse_starting_hand(line):
     line, _, _ = line.rsplit(",")
     match = STARTING_REGEX.match(line)
 
-    if match == None:
+    if match is None:
         raise ValueError(f"Could not parse starting hand line from: {line}")
 
     return int(match.group(1))

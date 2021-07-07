@@ -1,3 +1,5 @@
+# pylint: disable=redefined-outer-name
+
 """JSON testing fixtures """
 
 import pytest

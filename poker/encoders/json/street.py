@@ -1,5 +1,4 @@
 """JSON encoder for street object"""
-from json import JSONEncoder
 
 from poker.model.street import Street
 from poker.model.actions import Action, ActionWithAmount, ActionWithCards
@@ -13,9 +12,9 @@ from poker.encoders.json.actions import (
 class StreetEncoder:
     """Extends JSONEncoder for Street object"""
 
-    def encode(self, object):
+    def encode(self, obj):
         """Street -> JSON"""
-        if isinstance(object, Street):
+        if isinstance(obj, Street):
 
             a_encoder = ActionEncoder()
             awa_encoder = ActionWithAmountEncoder()
@@ -23,7 +22,7 @@ class StreetEncoder:
 
             serialized = []
 
-            for action in object.actions:
+            for action in obj.actions:
 
                 if isinstance(action, Action):
                     json_repr = a_encoder.encode(action)

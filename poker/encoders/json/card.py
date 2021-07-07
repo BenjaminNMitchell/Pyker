@@ -1,7 +1,5 @@
 """Json Encoder for card Object"""
 
-from json import JSONEncoder
-
 from poker.model.card import Card
 from poker.encoders.json.exceptions import UnsupportedObjectToJSON
 
@@ -9,8 +7,9 @@ from poker.encoders.json.exceptions import UnsupportedObjectToJSON
 class CardEncoder:
     """Card object to JSON"""
 
-    def encode(self, object):
-        if isinstance(object, Card):
-            return {"suit": str(object.suit), "value": str(object.value)}
+    def encode(self, obj):
+        """Card -> JSON"""
+        if isinstance(obj, Card):
+            return {"suit": str(obj.suit), "value": str(obj.value)}
 
-        raise UnsupportedObjectToJSON(f"CardEncoder called on {type(object)}")
+        raise UnsupportedObjectToJSON(f"CardEncoder called on {type(obj)}")

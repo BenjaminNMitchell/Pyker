@@ -1,3 +1,5 @@
+# pylint: disable=redefined-outer-name
+
 """Poker model fixtures"""
 
 import pytest

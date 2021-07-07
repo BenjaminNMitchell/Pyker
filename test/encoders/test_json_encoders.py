@@ -1,9 +1,35 @@
 """Collection of tests for model objects -> JSON"""
+# pylint: disable=redefined-outer-name, unused-import
+
 from poker.encoders.json.exceptions import UnsupportedObjectToJSON
 from unittest import TestCase
 
-from test.encoders.json_fixtures import *
-from test.model.model_fixtures import *
+from test.encoders.json_fixtures import (
+    ace_spades_json,
+    rus_check_json,
+    rus_player_json,
+    benny_bet_json,
+    oven_show_json,
+    street_check_fold_json,
+    hand_preflop_json,
+    benny_player_json,
+    rus_fold_json,
+    oven_player_json,
+    starting_stacks_rus_ben_oven_json,
+)
+from test.model.model_fixtures import (
+    ace_spades,
+    rus_check,
+    rus_player,
+    benny_bet,
+    oven_show,
+    street_check_fold,
+    hand_preflop,
+    benny_player,
+    rus_fold,
+    oven_player,
+    starting_stacks_rus_ben_oven,
+)
 
 import pytest
 

@@ -1,6 +1,6 @@
 """JSON encoder for Hand object"""
-from json import JSONEncoder
 
+from poker.encoders.json.exceptions import UnsupportedObjectToJSON
 from poker.model.hand import Hand
 
 from poker.encoders.json.player import PlayerEncoder
@@ -8,43 +8,43 @@ from poker.encoders.json.street import StreetEncoder
 from poker.encoders.json.card import CardEncoder
 
 
-class HandEncoder(JSONEncoder):
+class HandEncoder:
     """Encoder for Hand Object"""
 
-    def encode(self, object):
+    def encode(self, obj):
         """Hand to JSON"""
-        if isinstance(object, Hand):
+        if isinstance(obj, Hand):
             json_repr = {}
 
             p_encoder = PlayerEncoder()
             c_encoder = CardEncoder()
             s_encoder = StreetEncoder()
 
-            json_repr["id_"] = str(object.id_)
-            json_repr["players"] = [p_encoder.encode(x) for x in object.players]
+            json_repr["id_"] = str(obj.id_)
+            json_repr["players"] = [p_encoder.encode(x) for x in obj.players]
 
             json_repr["stacks"] = {}
 
-            for p in object.stacks.keys():
-                json_repr["stacks"][p.name.lower()] = str(object.stacks[p])
+            for p in obj.stacks.keys():
+                json_repr["stacks"][p.name.lower()] = str(obj.stacks[p])
 
-            json_repr["our_cards"] = [c_encoder.encode(x) for x in object.our_cards]
-            json_repr["preflop"] = s_encoder.encode(object.preflop)
+            json_repr["our_cards"] = [c_encoder.encode(x) for x in obj.our_cards]
+            json_repr["preflop"] = s_encoder.encode(obj.preflop)
 
-            if object.first:
-                json_repr["first"] = s_encoder.encode(object.first)
-            if object.second:
-                json_repr["second"] = s_encoder.encode(object.second)
-            if object.third:
-                json_repr["third"] = s_encoder.encode(object.third)
+            if obj.first:
+                json_repr["first"] = s_encoder.encode(obj.first)
+            if obj.second:
+                json_repr["second"] = s_encoder.encode(obj.second)
+            if obj.third:
+                json_repr["third"] = s_encoder.encode(obj.third)
 
-            if object.flop:
-                json_repr["flop"] = [c_encoder.encode(x) for x in object.flop]
-            if object.turn:
-                json_repr["turn"] = [c_encoder.encode(x) for x in object.turn]
-            if object.river:
-                json_repr["river"] = [c_encoder.encode(x) for x in object.river]
+            if obj.flop:
+                json_repr["flop"] = [c_encoder.encode(x) for x in obj.flop]
+            if obj.turn:
+                json_repr["turn"] = [c_encoder.encode(x) for x in obj.turn]
+            if obj.river:
+                json_repr["river"] = [c_encoder.encode(x) for x in obj.river]
 
             return json_repr
 
-        return JSONEncoder.encode(object)
+        raise UnsupportedObjectToJSON(f"HandEncoder called on {type(obj)}")
