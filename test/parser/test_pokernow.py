@@ -65,14 +65,14 @@ class ParserTests(unittest.TestCase):
             ",2021-01-09T18:13:11.491Z,161021599150607"
         )
 
-        expected = [
-            (Player(id_="9z1zzoqiIt", name="Ert"), 2000),
-            (Player(id_="TfZNpyIPhD", name="Suk"), 2000),
-            (Player(id_="PjBYO_8gbf", name="Russ"), 2000),
-            (Player(id_="bcp1N58-1M", name="Chon"), 2000),
-            (Player(id_="eSbnubU-KP", name="Benny"), 2000),
-            (Player(id_="izsy1Zibpi", name="Gargs"), 2000),
-        ]
+        expected = {
+            Player(id_="9z1zzoqiIt", name="Ert"): 2000,
+            Player(id_="TfZNpyIPhD", name="Suk"): 2000,
+            Player(id_="PjBYO_8gbf", name="Russ"): 2000,
+            Player(id_="bcp1N58-1M", name="Chon"): 2000,
+            Player(id_="eSbnubU-KP", name="Benny"): 2000,
+            Player(id_="izsy1Zibpi", name="Gargs"): 2000,
+        }
 
         _, actual = parser.parse_players(test_player_lines)
 
@@ -155,7 +155,7 @@ class ParserTests(unittest.TestCase):
         ]
 
         expected_hand = Hand(
-            id=6,
+            id_=6,
             players={
                 Player(name="Ben", id_="eSbnubU-KP"),
                 Player(name="Eddy KGB", id_="_7OU6FzFZP"),
@@ -163,13 +163,13 @@ class ParserTests(unittest.TestCase):
                 Player(name="Max", id_="izsy1Zibpi"),
                 Player(name="rus", id_="PjBYO_8gbf"),
             },
-            stacks=[
-                (Player(name="MOP", id_="jwf61y3XJg"), 1060),
-                (Player(name="rus", id_="PjBYO_8gbf"), 971),
-                (Player(name="Eddy KGB", id_="_7OU6FzFZP"), 1025),
-                (Player(name="Ben", id_="eSbnubU-KP"), 1057),
-                (Player(name="Max", id_="izsy1Zibpi"), 887),
-            ],
+            stacks={
+                Player(name="MOP", id_="jwf61y3XJg"): 1060,
+                Player(name="rus", id_="PjBYO_8gbf"): 971,
+                Player(name="Eddy KGB", id_="_7OU6FzFZP"): 1025,
+                Player(name="Ben", id_="eSbnubU-KP"): 1057,
+                Player(name="Max", id_="izsy1Zibpi"): 887,
+            },
             our_cards=(Card.from_string("Q♠"), Card.from_string("3♠")),
             preflop=Street(
                 actions=[

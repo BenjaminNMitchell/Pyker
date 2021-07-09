@@ -1,10 +1,10 @@
 
-.PHONY: static-checks test lint check-format
+.PHONY: static-checks test lint check-format format
 
 static-checks: test check-format lint check-types
 
 test:
-	pipenv run python -m unittest discover
+	pipenv run pytest test
 
 lint:
 	pipenv run pylint --fail-under=9 poker
@@ -19,3 +19,6 @@ check-types:
 report-coverage:
 	pipenv run coverage run --source=poker,test -m unittest discover
 	pipenv run coverage report -m 
+
+format:
+	pipenv run black .

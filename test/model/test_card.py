@@ -68,19 +68,19 @@ class CardTests(unittest.TestCase):
 
         test_cases = [
             {
-                "string": "J♠",
+                "string": "JS",
                 "card": card.Card(value=card.Values.JACK, suit=card.Suits.SPADES),
             },
             {
-                "string": "Q♦",
+                "string": "QD",
                 "card": card.Card(value=card.Values.QUEEN, suit=card.Suits.DIAMONDS),
             },
             {
-                "string": "K♥",
+                "string": "KH",
                 "card": card.Card(value=card.Values.KING, suit=card.Suits.HEARTS),
             },
             {
-                "string": "A♣",
+                "string": "AC",
                 "card": card.Card(value=card.Values.ACE, suit=card.Suits.CLUBS),
             },
         ]

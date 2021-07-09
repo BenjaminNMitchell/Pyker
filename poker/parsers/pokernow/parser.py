@@ -92,7 +92,7 @@ def parse_hand(hand_lines):
     # TODO filter out any lines that aren't part of the game `the player requested...` `the admin...`
     i = 0
 
-    id = parse_starting_hand(hand_lines[i])
+    id_ = parse_starting_hand(hand_lines[i])
 
     while "Player stacks" not in hand_lines[i]:
         i += 1
@@ -112,7 +112,7 @@ def parse_hand(hand_lines):
     else:
         logging.debug("No flop found on line %s", i)
         return hand.Hand(
-            id=id,
+            id_=id_,
             stacks=stacks,
             players=players,
             our_cards=our_cards,
@@ -133,7 +133,7 @@ def parse_hand(hand_lines):
     else:
         logging.debug("No turn found on line %s", i)
         return hand.Hand(
-            id=id,
+            id_=id_,
             stacks=stacks,
             players=players,
             our_cards=our_cards,
@@ -154,7 +154,7 @@ def parse_hand(hand_lines):
     else:
         logging.debug("No river found on line %s", i)
         return hand.Hand(
-            id=id,
+            id_=id_,
             stacks=stacks,
             players=players,
             our_cards=our_cards,
@@ -169,7 +169,7 @@ def parse_hand(hand_lines):
 
     third, i = parse_street(hand_lines, i, "-- ending hand")
     return hand.Hand(
-        id=id,
+        id_=id_,
         stacks=stacks,
         players=players,
         our_cards=our_cards,
@@ -187,7 +187,7 @@ def parse_starting_hand(line):
     line, _, _ = line.rsplit(",")
     match = STARTING_REGEX.match(line)
 
-    if match == None:
+    if match is None:
         raise ValueError(f"Could not parse starting hand line from: {line}")
 
     return int(match.group(1))
@@ -221,7 +221,7 @@ def parse_players(line):
     players = [player.strip() for player in players]
 
     player_objs = []
-    stacks = []
+    stacks = {}
 
     for player_string in players:
         match = PLAYER_STACK_REGEX.search(player_string)
@@ -231,7 +231,7 @@ def parse_players(line):
         player_obj = player.Player(name=match.group(2), id_=match.group(3))
 
         player_objs.append(player_obj)
-        stacks.append((player_obj, int(match.group(4))))
+        stacks[player_obj] = int(match.group(4))
 
     return set(player_objs), stacks
 
@@ -264,7 +264,7 @@ def parse_action(line):
 
     if "Uncalled" in line:
         match = UNCALLED_REGEX.search(action_string)
-        if match == None:
+        if match is None:
             raise ValueError(
                 f"Could not parse action string: {action_string} as return action"
             )

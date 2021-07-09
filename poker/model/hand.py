@@ -1,6 +1,6 @@
 """This module defines a hand of texas holdem."""
 
-from typing import List, Tuple, Set
+from typing import Tuple, Set, Dict
 from dataclasses import dataclass
 
 from poker.model import street
@@ -12,8 +12,8 @@ from poker.model import player
 class Hand:
     """A hand of texas holdem."""
 
-    id: int
-    stacks: List[Tuple[player.Player, int]]
+    id_: int
+    stacks: Dict[player.Player, int]
     players: Set[player.Player]
     our_cards: Tuple[card.Card]
     preflop: street.Street
